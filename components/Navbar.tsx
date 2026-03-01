@@ -22,12 +22,11 @@ export default function Navbar() {
         isFixed={true}
         items={menuItems}
         socialItems={socialItems}
-        // MONOCHROME BASE WITH YOUR CUSTOM ACCENT
         colors={['#000000', '#0a0a0a', '#111111']} 
-        accentColor="#5227ff"      // Your requested hover/accent color
+        accentColor="#5227ff"
         menuButtonColor="#ffffff"
         openMenuButtonColor="#000000"
-        logoUrl="/hhlogo.png"      // Next.js public path
+        logoUrl="/hhlogo.png"
         changeMenuColorOnOpen={true}
       />
     </div>
