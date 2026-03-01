@@ -1,160 +1,125 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import Image from "next/image";
-import Link from "next/link";
-import { Terminal, Trophy, Code, Cpu, ChevronRight } from "lucide-react";
-import gsap from "gsap";
-
-// A ReactBits-inspired animated text component for the Hero
-const SplitText = ({ text }: { text: string }) => {
-  return (
-    <span className="inline-block overflow-hidden">
-      {text.split("").map((char, i) => (
-        <motion.span
-          key={i}
-          initial={{ y: "100%", opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: i * 0.05, ease: [0.33, 1, 0.68, 1] }}
-          className="inline-block whitespace-pre"
-        >
-          {char}
-        </motion.span>
-      ))}
-    </span>
-  );
-};
+import React from 'react';
+import { motion } from 'framer-motion';
+import LiquidEther from './LiquidEther';
+import ScrollVelocity from './ScrollVelocity';
 
 export default function LandingPage() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: containerRef });
-  const yParallax = useTransform(scrollYProgress, [0, 1], [0, -100]);
-
-  // GSAP animation for the stats section to give it a gamified "counting up" feel
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from(".stat-card", {
-        y: 50,
-        opacity: 0,
-        stagger: 0.2,
-        duration: 0.8,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ".stats-container",
-          start: "top 80%",
-        },
-      });
-    }, containerRef);
-    return () => ctx.revert();
-  }, []);
-
   return (
-    <div ref={containerRef} className="w-full bg-black text-white selection:bg-white selection:text-black">
+    <div className="w-full bg-black flex flex-col">
       
-      {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-6 overflow-hidden">
-        {/* Subtle grid background for that "computing" vibe */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] -z-10" />
+      {/* HERO SECTION */}
+      <section className="relative w-full min-h-screen bg-black overflow-hidden flex flex-col items-center justify-center">
         
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          className="mb-8"
-        >
-          {/* Note: In Next.js, public folder assets are referenced from the root */}
-          <Image 
-            src="/hhlogo.png" 
-            alt="Hackathon Hub Logo" 
-            width={120} 
-            height={120} 
-            className="filter grayscale hover:grayscale-0 transition-all duration-500"
+        {/* BACKGROUND: The Liquid Animation mf */}
+        {/* We keep pointer-events-none on the DIV so buttons work, 
+            but ensure LiquidEther component is set to auto internally */}
+        <div className="absolute inset-0 z-0 opacity-80 pointer-events-none">
+          <LiquidEther
+            // Brightened the palette so it's actually visible against pure black
+            colors={['#5227ff', '#2200ff', '#000000']}
+            mouseForce={35}
+            cursorSize={100}
+            isViscous={true}
+            viscous={30}
+            autoDemo={true}
+            autoSpeed={0.5}
+            interactive={true}
           />
-        </motion.div>
+        </div>
 
-        <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-center mb-6 uppercase">
-          <SplitText text="Hackathon Hub" />
-        </h1>
-        
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          className="text-neutral-400 text-lg md:text-2xl text-center max-w-2xl font-light mb-10"
-        >
-          NSBM Green University's elite computing society. Build, compete, and level up your engineering skills.
-        </motion.p>
-
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="flex gap-4"
-        >
-          <Link href="#join" className="group relative px-8 py-4 bg-white text-black font-bold uppercase tracking-wider overflow-hidden rounded-sm">
-            <span className="relative z-10 flex items-center gap-2">
-              Initialize_Profile <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        {/* HERO CONTENT */}
+        <div className="relative z-10 w-full max-max-7xl px-6 flex flex-col items-center text-center">
+          
+          {/* Top Badge */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="mb-6 px-4 py-1 border border-white/10 rounded-full bg-white/5 backdrop-blur-md"
+          >
+            <span className="text-[10px] uppercase tracking-[0.3em] text-neutral-400 font-medium">
+              NSBM Green University • Computing Society
             </span>
-            <div className="absolute inset-0 bg-neutral-300 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0" />
-          </Link>
+          </motion.div>
+
+          {/* Main Headline - Massive & Professional */}
+          <motion.h1 
+            initial={{ opacity: 0, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, filter: 'blur(0px)' }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="text-6xl md:text-9xl font-black tracking-tighter text-white uppercase leading-[0.85]"
+          >
+            HACKATHON <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-500">
+              HUB
+            </span>
+          </motion.h1>
+
+          {/* Tagline */}
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="mt-8 max-w-2xl text-neutral-400 text-sm md:text-lg font-light leading-relaxed tracking-wide"
+          >
+            We are the heartbeat of innovation at NSBM. A collective of developers, designers, and dreamers 
+            pushing the boundaries of what's possible through code.
+          </motion.p>
+
+          {/* CTA Buttons */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+            className="mt-12 flex flex-col sm:flex-row gap-4"
+          >
+            <button className="group relative px-10 py-4 bg-white text-black font-bold uppercase text-xs tracking-widest transition-all hover:bg-[#5227ff] hover:text-white overflow-hidden">
+              <span className="relative z-10">Join the Society</span>
+              <div className="absolute inset-0 bg-[#5227ff] translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+            </button>
+            
+            <button className="px-10 py-4 border border-white/20 text-white font-bold uppercase text-xs tracking-widest hover:border-[#5227ff] hover:text-[#5227ff] transition-all bg-black/40 backdrop-blur-sm">
+              Explore Events
+            </button>
+          </motion.div>
+        </div>
+
+        {/* HUD/Decorative elements */}
+        <div className="absolute bottom-10 left-10 hidden lg:block">
+           <p className="text-[9px] font-mono text-neutral-600 tracking-widest">SYSTEM_STATUS: ACTIVE</p>
+           <p className="text-[9px] font-mono text-[#5227ff] tracking-widest">LOCATION: 6.8211 N, 80.0409 E</p>
+        </div>
+
+        {/* Scroll Indicator */}
+        <motion.div 
+          animate={{ y: [0, 10, 0] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        >
+          <div className="w-[1px] h-12 bg-gradient-to-b from-white/0 via-white/50 to-white/0" />
         </motion.div>
+
+        {/* Decorative Corners */}
+        <div className="hidden lg:block absolute top-10 left-10 w-24 h-24 border-t border-l border-white/10" />
+        <div className="hidden lg:block absolute bottom-10 right-10 w-24 h-24 border-b border-r border-white/10" />
       </section>
 
-      {/* Gamified Tracks / Educational Standards Section */}
-      <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
-        <div className="flex justify-between items-end mb-16 border-b border-neutral-800 pb-8">
-          <div>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-2">Select Your Track</h2>
-            <p className="text-neutral-500">Master the core disciplines of modern computing.</p>
-          </div>
-          <div className="hidden md:flex gap-2">
-            <span className="px-3 py-1 border border-neutral-800 rounded-full text-xs text-neutral-400">XP Multiplier Active</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            { title: "Frontend Engineering", icon: <Code className="w-8 h-8" />, desc: "React, Next.js, animations, and UI/UX." },
-            { title: "Backend Systems", icon: <Terminal className="w-8 h-8" />, desc: "Supabase, Node, APIs, and databases." },
-            { title: "Algorithms & AI", icon: <Cpu className="w-8 h-8" />, desc: "Machine learning, Python, and logic puzzles." }
-          ].map((track, i) => (
-            <motion.div 
-              key={i}
-              whileHover={{ y: -10, borderColor: "rgba(255,255,255,0.5)" }}
-              className="p-8 border border-neutral-800 rounded-xl bg-neutral-950 flex flex-col gap-6 cursor-pointer transition-colors"
-            >
-              <div className="w-16 h-16 rounded-full bg-neutral-900 flex items-center justify-center text-white">
-                {track.icon}
-              </div>
-              <div>
-                <h3 className="text-xl font-bold mb-2">{track.title}</h3>
-                <p className="text-neutral-400 text-sm leading-relaxed">{track.desc}</p>
-              </div>
-              <div className="mt-auto pt-4 flex items-center gap-2 text-xs font-mono text-neutral-500">
-                <span>[ Explore Module ]</span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+      {/* VELOCITY SCROLL SECTION */}
+      <section className="w-full py-20 border-y border-white/5 bg-black overflow-hidden">
+        <ScrollVelocity
+          texts={[
+            'HACKATHON HUB • NSBM GREEN UNIVERSITY •', 
+            'CODE • COMPETE • CONQUER •'
+          ]} 
+          velocity={60}
+          className="text-white font-black italic uppercase tracking-tighter"
+        />
       </section>
 
-      {/* Stats / Gamification Section */}
-      <section className="py-24 bg-neutral-950 border-y border-neutral-900 stats-container">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-neutral-800">
-          {[
-            { label: "Active Members", val: "500+" },
-            { label: "Hackathons Won", val: "24" },
-            { label: "Lines of Code", val: "1M+" },
-            { label: "Coffee Consumed", val: "∞" }
-          ].map((stat, i) => (
-            <div key={i} className="stat-card flex flex-col items-center justify-center text-center pl-8 first:pl-0 border-none">
-              <span className="text-4xl md:text-6xl font-black mb-2">{stat.val}</span>
-              <span className="text-neutral-500 text-sm uppercase tracking-widest">{stat.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* PLACEHOLDER FOR NEXT SECTION */}
+      <section className="w-full min-h-[50vh] bg-black" />
 
     </div>
   );

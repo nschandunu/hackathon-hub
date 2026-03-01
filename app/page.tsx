@@ -21,7 +21,7 @@ export default function Home() {
         <footer className="w-full flex flex-col md:flex-row items-center justify-between border-t border-white/5 px-10 py-12 text-xs text-neutral-500 bg-black">
           <div className="mb-4 md:mb-0">
             <p className="font-medium text-neutral-400">NSBM GREEN UNIVERSITY</p>
-            <p>© {new Date().getFullYear()} Hackathon Hub. Built for the future.</p>
+            <p>© 2026 Hackathon Hub. Built for the future.</p>
           </div>
           
           <div className="flex gap-8 items-center uppercase tracking-widest">
