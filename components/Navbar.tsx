@@ -1,0 +1,35 @@
+"use client";
+
+import StaggeredMenu from './StaggeredMenu';
+
+export default function Navbar() {
+  const menuItems = [
+    { label: 'Home', ariaLabel: 'Go to home', link: '/' },
+    { label: 'Events', ariaLabel: 'View events', link: '/events' },
+    { label: 'About', ariaLabel: 'About Us', link: '/about' },
+    { label: 'Contact', ariaLabel: 'Contact Us', link: '/contact' },
+  ];
+
+  const socialItems = [
+    { label: 'GitHub', link: 'https://github.com' },
+    { label: 'LinkedIn', link: 'https://linkedin.com' },
+  ];
+
+  return (
+    <div className="fixed top-0 w-full z-[100]">
+      <StaggeredMenu
+        position="right"
+        isFixed={true}
+        items={menuItems}
+        socialItems={socialItems}
+        // MONOCHROME BASE WITH YOUR CUSTOM ACCENT
+        colors={['#000000', '#0a0a0a', '#111111']} 
+        accentColor="#5227ff"      // Your requested hover/accent color
+        menuButtonColor="#ffffff"
+        openMenuButtonColor="#000000"
+        logoUrl="/hhlogo.png"      // Next.js public path
+        changeMenuColorOnOpen={true}
+      />
+    </div>
+  );
+}
