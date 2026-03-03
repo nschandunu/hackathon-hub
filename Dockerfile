@@ -1,5 +1,6 @@
 # Dockerfile
-FROM node:18-alpine AS base
+# Bumped to Node 20 to satisfy Next.js 14+ requirements
+FROM node:20-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -26,6 +27,7 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
+# This requires 'output: "standalone"' in your next.config.mjs!
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
