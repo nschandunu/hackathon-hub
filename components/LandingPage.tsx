@@ -20,7 +20,7 @@ function MagneticButton({
   children, 
   className = "",
   strength = 0.3,
-  glowColor = "rgba(10, 132, 255, 0.4)"
+  glowColor = "rgba(107, 142, 35, 0.4)"
 }: { 
   children: React.ReactNode; 
   className?: string;
@@ -353,7 +353,7 @@ function SectionTitle({
         initial={{ opacity: 0, y: 20 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, ease: appleEase }}
-        className="text-[11px] md:text-xs uppercase tracking-[0.4em] text-[#0A84FF] font-medium mb-6"
+        className="text-[11px] md:text-xs uppercase tracking-[0.4em] text-[#6B8E23] font-medium mb-6"
       >
         {label}
       </motion.span>
@@ -364,7 +364,7 @@ function SectionTitle({
           initial={{ opacity: 0, scale: 0.9 }}
           animate={isInView ? { opacity: 1, scale: 1 } : {}}
           transition={{ duration: 1.2, delay: 0.5, ease: appleEase }}
-          className="block text-transparent bg-clip-text bg-gradient-to-r from-[#0A84FF] via-[#BF5AF2] to-[#FF375F]"
+          className="block text-transparent bg-clip-text bg-gradient-to-r from-[#6B8E23] via-[#8FBC8F] to-[#556B2F]"
         >
           {highlight}
         </motion.span>
@@ -524,11 +524,11 @@ function BentoEvents() {
                   style={{ transform: 'translateZ(30px)' }}
                 >
                   <motion.span 
-                    className="text-[#0A84FF] text-[10px] md:text-[11px] tracking-[0.2em] mb-3 font-medium self-start px-3 py-1.5 rounded-full bg-[#0A84FF]/10 backdrop-blur-sm border border-[#0A84FF]/20"
+                    className="text-[#6B8E23] text-[10px] md:text-[11px] tracking-[0.2em] mb-3 font-medium self-start px-3 py-1.5 rounded-full bg-[#6B8E23]/10 backdrop-blur-sm border border-[#6B8E23]/20"
                     whileHover={{ 
                       scale: 1.08, 
-                      backgroundColor: 'rgba(10, 132, 255, 0.25)',
-                      boxShadow: '0 0 20px rgba(10, 132, 255, 0.3)'
+                      backgroundColor: 'rgba(107, 142, 35, 0.25)',
+                      boxShadow: '0 0 20px rgba(107, 142, 35, 0.3)'
                     }}
                     transition={{ duration: 0.3 }}
                   >
@@ -555,7 +555,7 @@ function BentoEvents() {
                   <div className="mt-5 flex items-center justify-between">
                     <span className="text-[#86868B] text-[11px] tracking-wider font-medium">{event.date}</span>
                     <motion.div 
-                      className="flex items-center gap-2 text-[#0A84FF] text-xs font-medium"
+                      className="flex items-center gap-2 text-[#6B8E23] text-xs font-medium"
                       initial={{ opacity: 0, x: -15 }}
                       whileHover={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.4 }}
@@ -684,7 +684,7 @@ function AnimatedCounter({
         {displayValue}{suffix}
       </motion.span>
       <motion.div 
-        className="absolute inset-0 rounded-full bg-gradient-to-r from-[#0A84FF]/20 to-[#BF5AF2]/20 blur-3xl -z-10"
+        className="absolute inset-0 rounded-full bg-gradient-to-r from-[#6B8E23]/20 to-[#8FBC8F]/20 blur-3xl -z-10"
         initial={{ opacity: 0, scale: 0 }}
         animate={isInView ? { opacity: 0.6, scale: 1.5 } : {}}
         transition={{ duration: 1.5, delay: delay + 0.5, ease: appleEase }}
@@ -710,7 +710,7 @@ function AboutSection() {
     >
       <motion.div 
         style={{ y: backgroundY }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full bg-gradient-to-r from-[#0A84FF]/15 via-[#BF5AF2]/10 to-transparent blur-[150px] pointer-events-none" 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full bg-gradient-to-r from-[#6B8E23]/15 via-[#8FBC8F]/10 to-transparent blur-[150px] pointer-events-none" 
       />
       
       <motion.div 
@@ -719,7 +719,7 @@ function AboutSection() {
           opacity: [0.1, 0.2, 0.1]
         }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full bg-[#BF5AF2]/10 blur-[120px] pointer-events-none" 
+        className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full bg-[#8FBC8F]/10 blur-[120px] pointer-events-none" 
       />
       
       <div className="max-w-5xl w-full flex flex-col items-center text-center relative z-10">
@@ -731,7 +731,7 @@ function AboutSection() {
           transition={{ duration: 1, ease: appleEase }}
           className="mb-10"
         >
-          <span className="text-[11px] md:text-xs uppercase tracking-[0.4em] text-[#0A84FF] font-medium">
+          <span className="text-[11px] md:text-xs uppercase tracking-[0.4em] text-[#6B8E23] font-medium">
             About us
           </span>
         </motion.div>
@@ -751,9 +751,9 @@ function AboutSection() {
 
         <div className="mt-24 md:mt-32 grid grid-cols-3 gap-6 md:gap-16 lg:gap-24">
           {[
-            { value: 50, suffix: "+", label: "Events Hosted", color: "#0A84FF" },
-            { value: 2, suffix: "K+", label: "Participants", color: "#BF5AF2" },
-            { value: 100, suffix: "%", label: "Innovation", color: "#30D158" }
+            { value: 50, suffix: "+", label: "Events Hosted", color: "#6B8E23" },
+            { value: 2, suffix: "K+", label: "Participants", color: "#8FBC8F" },
+            { value: 100, suffix: "%", label: "Innovation", color: "#6B8E23" }
           ].map((stat, i) => (
             <motion.div 
               key={i} 
@@ -797,7 +797,7 @@ function AboutSection() {
         >
           <Link href="/about">
             <MagneticButton 
-              className="group relative px-12 py-5 rounded-full bg-gradient-to-r from-[#0A84FF] to-[#0A84FF] text-white font-semibold text-sm tracking-wide overflow-hidden transition-all duration-500 hover:shadow-[0_0_60px_rgba(10,132,255,0.5)]"
+              className="group relative px-12 py-5 rounded-full bg-gradient-to-r from-[#6B8E23] to-[#6B8E23] text-white font-semibold text-sm tracking-wide overflow-hidden transition-all duration-500 hover:shadow-[0_0_60px_rgba(10,132,255,0.5)]"
               strength={0.3}
             >
               <span className="relative z-10 flex items-center gap-3">
@@ -815,7 +815,7 @@ function AboutSection() {
               </span>
 
               <motion.div 
-                className="absolute inset-0 bg-gradient-to-r from-[#0A84FF] via-[#BF5AF2] to-[#0A84FF] bg-[length:200%_100%]"
+                className="absolute inset-0 bg-gradient-to-r from-[#6B8E23] via-[#8FBC8F] to-[#6B8E23] bg-[length:200%_100%]"
                 initial={{ opacity: 0 }}
                 whileHover={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
@@ -883,7 +883,7 @@ function ContactSection() {
       ),
       label: "Email",
       value: "hello@hackathonhub.dev",
-      color: "#0A84FF"
+      color: "#6B8E23"
     },
     { 
       icon: (
@@ -894,7 +894,7 @@ function ContactSection() {
       ),
       label: "Location",
       value: "NSBM Green University",
-      color: "#30D158"
+      color: "#6B8E23"
     },
     { 
       icon: (
@@ -904,7 +904,7 @@ function ContactSection() {
       ),
       label: "Response Time",
       value: "Within 24 hours",
-      color: "#BF5AF2"
+      color: "#8FBC8F"
     }
   ];
 
@@ -923,7 +923,7 @@ function ContactSection() {
     >
       <motion.div 
         style={{ y: backgroundY }}
-        className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full bg-gradient-to-l from-[#0A84FF]/10 via-[#BF5AF2]/5 to-transparent blur-[180px] pointer-events-none" 
+        className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full bg-gradient-to-l from-[#6B8E23]/10 via-[#8FBC8F]/5 to-transparent blur-[180px] pointer-events-none" 
       />
       <motion.div 
         animate={{ 
@@ -931,7 +931,7 @@ function ContactSection() {
           opacity: [0.08, 0.15, 0.08]
         }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full bg-[#30D158]/10 blur-[150px] pointer-events-none" 
+        className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full bg-[#6B8E23]/10 blur-[150px] pointer-events-none" 
       />
       
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:80px_80px] pointer-events-none opacity-50" />
@@ -944,7 +944,7 @@ function ContactSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: appleEase }}
-            className="text-[11px] md:text-xs uppercase tracking-[0.4em] text-[#0A84FF] font-medium mb-6 block"
+            className="text-[11px] md:text-xs uppercase tracking-[0.4em] text-[#6B8E23] font-medium mb-6 block"
           >
             Get in Touch
           </motion.span>
@@ -956,7 +956,7 @@ function ContactSection() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2, delay: 0.4, ease: appleEase }}
-              className="block text-transparent bg-clip-text bg-gradient-to-r from-[#0A84FF] via-[#BF5AF2] to-[#30D158]"
+              className="block text-transparent bg-clip-text bg-gradient-to-r from-[#6B8E23] via-[#8FBC8F] to-[#6B8E23]"
             >
               together.
             </motion.span>
@@ -994,10 +994,10 @@ function ContactSection() {
                     <input 
                       type="text"
                       placeholder="John Doe"
-                      className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#0A84FF]/50 focus:bg-white/[0.05] transition-all duration-500 text-sm"
+                      className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 focus:bg-white/[0.05] transition-all duration-500 text-sm"
                     />
                     <motion.div 
-                      className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[#0A84FF] to-[#BF5AF2] rounded-full"
+                      className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[#6B8E23] to-[#8FBC8F] rounded-full"
                       initial={{ width: '0%' }}
                       whileFocus={{ width: '100%' }}
                       transition={{ duration: 0.5, ease: appleEase }}
@@ -1015,7 +1015,7 @@ function ContactSection() {
                   <input 
                     type="email"
                     placeholder="john@example.com"
-                    className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#0A84FF]/50 focus:bg-white/[0.05] transition-all duration-500 text-sm"
+                    className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 focus:bg-white/[0.05] transition-all duration-500 text-sm"
                   />
                 </div>
 
@@ -1029,7 +1029,7 @@ function ContactSection() {
                   <input 
                     type="text"
                     placeholder="What's this about?"
-                    className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#0A84FF]/50 focus:bg-white/[0.05] transition-all duration-500 text-sm"
+                    className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 focus:bg-white/[0.05] transition-all duration-500 text-sm"
                   />
                 </div>
 
@@ -1043,13 +1043,13 @@ function ContactSection() {
                   <textarea 
                     rows={5}
                     placeholder="Tell us about your idea..."
-                    className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#0A84FF]/50 focus:bg-white/[0.05] transition-all duration-500 resize-none text-sm"
+                    className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 focus:bg-white/[0.05] transition-all duration-500 resize-none text-sm"
                   />
                 </div>
 
                 <div ref={el => { inputsRef.current[4] = el; }}>
                   <MagneticButton 
-                    className="w-full py-5 rounded-xl bg-gradient-to-r from-[#0A84FF] to-[#BF5AF2] text-white font-semibold text-sm tracking-wide hover:shadow-[0_0_50px_rgba(10,132,255,0.4)] transition-all duration-500 relative overflow-hidden group"
+                    className="w-full py-5 rounded-xl bg-gradient-to-r from-[#6B8E23] to-[#8FBC8F] text-white font-semibold text-sm tracking-wide hover:shadow-[0_0_50px_rgba(10,132,255,0.4)] transition-all duration-500 relative overflow-hidden group"
                     strength={0.2}
                   >
                     <span className="relative z-10 flex items-center justify-center gap-3">
@@ -1141,7 +1141,7 @@ function ContactSection() {
                       whileHover={{ 
                         y: -5, 
                         scale: 1.1,
-                        boxShadow: '0 10px 30px rgba(10, 132, 255, 0.2)'
+                        boxShadow: '0 10px 30px rgba(107, 142, 35, 0.2)'
                       }}
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
@@ -1181,14 +1181,14 @@ function ContactSection() {
                     <p className="text-[#86868B] text-sm mt-1">Pitipana, Homagama</p>
                   </div>
                   <motion.div 
-                    className="w-16 h-16 rounded-full bg-gradient-to-br from-[#30D158]/20 to-[#0A84FF]/20 flex items-center justify-center"
+                    className="w-16 h-16 rounded-full bg-gradient-to-br from-[#6B8E23]/20 to-[#6B8E23]/20 flex items-center justify-center"
                     animate={{ 
                       scale: [1, 1.1, 1],
-                      boxShadow: ['0 0 0 0 rgba(48, 209, 88, 0)', '0 0 0 20px rgba(48, 209, 88, 0.1)', '0 0 0 0 rgba(48, 209, 88, 0)']
+                      boxShadow: ['0 0 0 0 rgba(107, 142, 35, 0)', '0 0 0 20px rgba(107, 142, 35, 0.1)', '0 0 0 0 rgba(107, 142, 35, 0)']
                     }}
                     transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                   >
-                    <svg className="w-6 h-6 text-[#30D158]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-6 h-6 text-[#6B8E23]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
@@ -1269,7 +1269,7 @@ export default function LandingPage() {
   return (
     <div 
       ref={containerRef}
-      className="w-full bg-black flex flex-col antialiased selection:bg-[#0A84FF]/30 selection:text-white"
+      className="w-full bg-black flex flex-col antialiased selection:bg-[#6B8E23]/30 selection:text-white"
     >
       <section 
         ref={heroRef}
@@ -1283,7 +1283,7 @@ export default function LandingPage() {
               opacity: [0.15, 0.25, 0.15]
             }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1400px] rounded-full bg-gradient-radial from-[#0A84FF]/20 via-[#BF5AF2]/8 to-transparent blur-[150px]" 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1400px] rounded-full bg-gradient-radial from-[#6B8E23]/20 via-[#8FBC8F]/8 to-transparent blur-[150px]" 
           />
           
           <motion.div 
@@ -1293,7 +1293,7 @@ export default function LandingPage() {
               scale: [1, 1.15, 1]
             }}
             transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            className="hero-orb-1 absolute top-1/4 left-1/4 w-[800px] h-[800px] rounded-full bg-[#0A84FF]/15 blur-[180px]" 
+            className="hero-orb-1 absolute top-1/4 left-1/4 w-[800px] h-[800px] rounded-full bg-[#6B8E23]/15 blur-[180px]" 
           />
           <motion.div 
             animate={{ 
@@ -1302,7 +1302,7 @@ export default function LandingPage() {
               scale: [1, 0.85, 1]
             }}
             transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-            className="hero-orb-2 absolute bottom-1/4 right-1/4 w-[700px] h-[700px] rounded-full bg-[#BF5AF2]/15 blur-[180px]" 
+            className="hero-orb-2 absolute bottom-1/4 right-1/4 w-[700px] h-[700px] rounded-full bg-[#8FBC8F]/15 blur-[180px]" 
           />
           
           <motion.div 
@@ -1311,12 +1311,12 @@ export default function LandingPage() {
               scale: [1, 1.4, 1]
             }}
             transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#FF375F]/10 blur-[120px]" 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#556B2F]/10 blur-[120px]" 
           />
           
           <div className="absolute inset-0 opacity-15">
             <LiquidEther
-              colors={['#0A84FF', '#BF5AF2', '#000000']}
+              colors={['#6B8E23', '#8FBC8F', '#000000']}
               mouseForce={25}
               cursorSize={180}
               isViscous={true}
@@ -1343,7 +1343,7 @@ export default function LandingPage() {
               <motion.span 
                 animate={{ scale: [1, 1.3, 1], opacity: [1, 0.6, 1] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                className="w-2.5 h-2.5 rounded-full bg-[#30D158] shadow-[0_0_10px_#30D158]" 
+                className="w-2.5 h-2.5 rounded-full bg-[#6B8E23] shadow-[0_0_10px_#6B8E23]" 
               />
               <span className="text-[11px] uppercase tracking-[0.3em] text-[#86868B] font-medium">
                 NSBM Computing Society
@@ -1367,7 +1367,7 @@ export default function LandingPage() {
               initial={{ y: '120%', rotateX: -15, opacity: 0 }}
               animate={{ y: 0, rotateX: 0, opacity: 1 }}
               transition={{ duration: 1.6, delay: 0.5, ease: appleEase }}
-              className="block text-5xl md:text-7xl lg:text-[9rem] font-semibold tracking-tighter leading-[0.85] text-transparent bg-clip-text bg-gradient-to-r from-[#0A84FF] via-[#BF5AF2] to-[#FF375F]"
+              className="block text-5xl md:text-7xl lg:text-[9rem] font-semibold tracking-tighter leading-[0.85] text-transparent bg-clip-text bg-gradient-to-r from-[#6B8E23] via-[#8FBC8F] to-[#556B2F]"
             >
               Hub.
             </motion.span>
@@ -1417,7 +1417,7 @@ export default function LandingPage() {
             <MagneticButton 
               className="group px-12 py-5 rounded-full bg-white/[0.03] backdrop-blur-2xl border border-white/[0.1] text-white font-semibold text-sm tracking-wide hover:bg-white/[0.08] hover:border-white/[0.25] hover:shadow-[0_0_40px_rgba(10,132,255,0.2)] transition-all duration-700"
               strength={0.4}
-              glowColor="rgba(10, 132, 255, 0.5)"
+              glowColor="rgba(107, 142, 35, 0.5)"
             >
               <span className="flex items-center gap-3">
                 Explore Events
@@ -1487,7 +1487,7 @@ export default function LandingPage() {
 
       <footer className="w-full bg-black relative overflow-hidden">
         
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-[#0A84FF]/5 via-[#BF5AF2]/3 to-transparent blur-[100px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-[#6B8E23]/5 via-[#8FBC8F]/3 to-transparent blur-[100px] pointer-events-none" />
         
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
         
@@ -1502,7 +1502,7 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, ease: appleEase }}
             >
-              <h3 className="text-white text-2xl font-semibold tracking-tight mb-4">Hackathon<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0A84FF] to-[#BF5AF2]">Hub</span></h3>
+              <h3 className="text-white text-2xl font-semibold tracking-tight mb-4">Hackathon<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6B8E23] to-[#8FBC8F]">Hub</span></h3>
               <p className="text-[#86868B] text-sm leading-relaxed mb-6">
                 Where innovation meets action. The premier tech community at NSBM Green University.
               </p>
@@ -1552,7 +1552,7 @@ export default function LandingPage() {
                         className="text-[#86868B] text-sm hover:text-white transition-colors duration-300 flex items-center gap-2 group"
                         whileHover={{ x: 4 }}
                       >
-                        <span className="w-0 h-[1px] bg-[#0A84FF] group-hover:w-3 transition-all duration-300" />
+                        <span className="w-0 h-[1px] bg-[#6B8E23] group-hover:w-3 transition-all duration-300" />
                         {link}
                       </motion.a>
                     </li>
@@ -1578,10 +1578,10 @@ export default function LandingPage() {
                 <input 
                   type="email" 
                   placeholder="Enter your email" 
-                  className="flex-1 md:w-64 px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white text-sm placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#0A84FF]/50 transition-all duration-300"
+                  className="flex-1 md:w-64 px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white text-sm placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 transition-all duration-300"
                 />
                 <MagneticButton 
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#0A84FF] to-[#BF5AF2] text-white text-sm font-medium hover:shadow-[0_0_30px_rgba(10,132,255,0.4)] transition-all duration-300"
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#6B8E23] to-[#8FBC8F] text-white text-sm font-medium hover:shadow-[0_0_30px_rgba(10,132,255,0.4)] transition-all duration-300"
                   strength={0.2}
                 >
                   Subscribe
@@ -1625,7 +1625,7 @@ export default function LandingPage() {
           </div>
         </div>
         
-        <div className="h-[2px] bg-gradient-to-r from-transparent via-[#0A84FF]/30 to-transparent" />
+        <div className="h-[2px] bg-gradient-to-r from-transparent via-[#6B8E23]/30 to-transparent" />
         
       </footer>
 

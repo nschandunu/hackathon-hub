@@ -147,12 +147,12 @@ body {
 
 /* Selection styling */
 ::selection {
-  background: rgba(10, 132, 255, 0.3);
+  background: rgba(107, 142, 35, 0.3);
   color: white;
 }
 
 /* Focus ring for accessibility */
 *:focus-visible {
-  outline: 2px solid rgba(10, 132, 255, 0.5);
+  outline: 2px solid rgba(107, 142, 35, 0.5);
   outline-offset: 2px;
 }

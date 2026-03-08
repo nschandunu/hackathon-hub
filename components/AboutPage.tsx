@@ -12,6 +12,26 @@ if (typeof window !== 'undefined') {
 
 const appleEase: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
+// Deterministic pseudo-random generator for consistent SSR/client rendering
+const seededRandom = (seed: number) => {
+  const x = Math.sin(seed * 9999) * 10000;
+  return x - Math.floor(x);
+};
+
+// Pre-computed particle positions for hero section (20 particles)
+const HERO_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  left: seededRandom(i * 7 + 1) * 100,
+  top: seededRandom(i * 13 + 2) * 100,
+  opacity: seededRandom(i * 3 + 5) * 0.5 + 0.2,
+  scale: seededRandom(i * 11 + 7) * 2 + 0.5,
+}));
+
+// Pre-computed particle positions for CTA section (15 particles)
+const CTA_PARTICLES = Array.from({ length: 15 }, (_, i) => ({
+  left: seededRandom(i * 17 + 3) * 100,
+  top: seededRandom(i * 23 + 11) * 100,
+}));
+
 // ==================== UTILITY COMPONENTS ====================
 
 function GlassCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -107,7 +127,7 @@ function MagneticButton({
   children, 
   className = "",
   strength = 0.3,
-  glowColor = "rgba(10, 132, 255, 0.4)"
+  glowColor = "rgba(107, 142, 35, 0.4)"
 }: { 
   children: React.ReactNode; 
   className?: string;
@@ -265,23 +285,23 @@ function HeroSection() {
       </div>
 
       {/* Floating Particles */}
-      {[...Array(20)].map((_, i) => (
+      {HERO_PARTICLES.map((particle, i) => (
         <motion.div
           key={i}
           className="hero-particle absolute w-1 h-1 bg-white/30 rounded-full"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: `${particle.left}%`,
+            top: `${particle.top}%`,
           }}
           initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: Math.random() * 0.5 + 0.2, scale: Math.random() * 2 + 0.5 }}
+          animate={{ opacity: particle.opacity, scale: particle.scale }}
           transition={{ duration: 2, delay: i * 0.1 }}
         />
       ))}
 
       {/* Glowing Orbs */}
       <motion.div 
-        className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#0A84FF]/20 rounded-full blur-[150px]"
+        className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#6B8E23]/20 rounded-full blur-[150px]"
         animate={{ 
           scale: [1, 1.2, 1],
           opacity: [0.3, 0.5, 0.3]
@@ -289,7 +309,7 @@ function HeroSection() {
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div 
-        className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#BF5AF2]/20 rounded-full blur-[150px]"
+        className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#556B2F]/20 rounded-full blur-[150px]"
         animate={{ 
           scale: [1.2, 1, 1.2],
           opacity: [0.3, 0.5, 0.3]
@@ -305,7 +325,7 @@ function HeroSection() {
           transition={{ duration: 1, delay: 0.2 }}
           className="mb-8"
         >
-          <span className="text-[11px] md:text-xs uppercase tracking-[0.5em] text-[#0A84FF] font-medium px-6 py-2 rounded-full border border-[#0A84FF]/20 bg-[#0A84FF]/5 backdrop-blur-sm">
+          <span className="text-[11px] md:text-xs uppercase tracking-[0.5em] text-[#6B8E23] font-medium px-6 py-2 rounded-full border border-[#6B8E23]/20 bg-[#6B8E23]/5 backdrop-blur-sm">
             About Us
           </span>
         </motion.div>
@@ -318,7 +338,7 @@ function HeroSection() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, delay: 1.2, ease: appleEase }}
-            className="block text-transparent bg-clip-text bg-gradient-to-r from-[#0A84FF] via-[#BF5AF2] to-[#FF375F] animate-gradient bg-[length:200%_auto]"
+            className="block text-transparent bg-clip-text bg-gradient-to-r from-[#6B8E23] via-[#8FBC8F] to-[#556B2F] animate-gradient bg-[length:200%_auto]"
           >
             Tomorrow.
           </motion.span>
@@ -350,7 +370,7 @@ function HeroSection() {
           <span className="text-[#86868B] text-xs tracking-widest uppercase">Scroll</span>
           <motion.div className="w-6 h-10 rounded-full border border-white/20 flex items-start justify-center p-2">
             <motion.div 
-              className="w-1.5 h-1.5 bg-[#0A84FF] rounded-full"
+              className="w-1.5 h-1.5 bg-[#6B8E23] rounded-full"
               animate={{ y: [0, 16, 0] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             />
@@ -439,7 +459,7 @@ function AboutContentSection() {
   return (
     <section ref={sectionRef} className="relative w-full py-32 md:py-48 px-6 bg-black overflow-hidden">
       {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0A84FF]/5 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#6B8E23]/5 to-transparent" />
 
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
@@ -449,7 +469,7 @@ function AboutContentSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: appleEase }}
-            className="text-[11px] md:text-xs uppercase tracking-[0.4em] text-[#0A84FF] font-medium mb-6 block"
+            className="text-[11px] md:text-xs uppercase tracking-[0.4em] text-[#6B8E23] font-medium mb-6 block"
           >
             Our Story
           </motion.span>
@@ -461,7 +481,7 @@ function AboutContentSection() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2, delay: 0.5, ease: appleEase }}
-              className="block text-transparent bg-clip-text bg-gradient-to-r from-[#0A84FF] via-[#BF5AF2] to-[#FF375F]"
+              className="block text-transparent bg-clip-text bg-gradient-to-r from-[#6B8E23] via-[#8FBC8F] to-[#556B2F]"
             >
               tech innovation.
             </motion.span>
@@ -496,7 +516,7 @@ function AboutContentSection() {
                     viewport={{ once: true }}
                     transition={{ delay: 0.3 }}
                   >
-                    <span className="text-[#0A84FF] text-xs tracking-[0.2em] uppercase font-medium">Established 2020</span>
+                    <span className="text-[#6B8E23] text-xs tracking-[0.2em] uppercase font-medium">Established 2020</span>
                     <h3 className="text-white text-2xl md:text-3xl font-semibold mt-2">Where Ideas Come Alive</h3>
                   </motion.div>
 
@@ -579,7 +599,7 @@ function AboutContentSection() {
                     
                     {/* Hover Overlay */}
                     <motion.div 
-                      className="absolute inset-0 bg-[#0A84FF]/20 opacity-0"
+                      className="absolute inset-0 bg-[#6B8E23]/20 opacity-0"
                       whileHover={{ opacity: 1 }}
                       transition={{ duration: 0.3 }}
                     />
@@ -594,7 +614,7 @@ function AboutContentSection() {
         <div className="mt-20 md:mt-32">
           <div 
             ref={el => { imageRefs.current[3] = el; }}
-            className="relative w-full min-h-[300px] sm:min-h-[350px] md:min-h-[400px] lg:min-h-[450px] rounded-3xl overflow-hidden group cursor-pointer"
+            className="relative w-full min-h-[400px] sm:min-h-[450px] md:min-h-[500px] lg:min-h-[550px] rounded-3xl overflow-hidden group cursor-pointer"
             style={{ transformStyle: 'preserve-3d', perspective: '1000px' }}
           >
             <GlassCard className="h-full">
@@ -608,7 +628,7 @@ function AboutContentSection() {
               <div className="absolute inset-0 bg-black/60" />
               
               {/* Content Overlay */}
-              <div className="absolute inset-0 flex items-center justify-center p-8">
+              <div className="absolute inset-0 flex items-center justify-center p-8 py-16">
                 <div className="text-center">
                   <motion.h3 
                     className="text-white text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight"
@@ -637,7 +657,7 @@ function AboutContentSection() {
                 initial={{ opacity: 0 }}
                 whileHover={{ opacity: 1 }}
               >
-                <div className="absolute inset-0 rounded-3xl border-2 border-[#0A84FF]/50" />
+                <div className="absolute inset-0 rounded-3xl border-2 border-[#6B8E23]/50" />
               </motion.div>
             </GlassCard>
           </div>
@@ -843,7 +863,7 @@ function BoardMemberCard({ member, index }: { member: BoardMember; index: number
               
               {/* Glow Ring */}
               <div 
-                className={`absolute -inset-1 rounded-full border-2 border-[#0A84FF]/50 transition-all duration-500 ${isExpanded ? 'opacity-100 scale-100' : 'opacity-0 scale-110'}`}
+                className={`absolute -inset-1 rounded-full border-2 border-[#6B8E23]/50 transition-all duration-500 ${isExpanded ? 'opacity-100 scale-100' : 'opacity-0 scale-110'}`}
               />
               
               {/* Rotating Glow */}
@@ -851,7 +871,7 @@ function BoardMemberCard({ member, index }: { member: BoardMember; index: number
                 <motion.div 
                   className="absolute -inset-2 rounded-full"
                   style={{
-                    background: 'conic-gradient(from 0deg, transparent, #0A84FF, transparent)',
+                    background: 'conic-gradient(from 0deg, transparent, #6B8E23, transparent)',
                     opacity: 0.5
                   }}
                   animate={{ rotate: 360 }}
@@ -868,7 +888,7 @@ function BoardMemberCard({ member, index }: { member: BoardMember; index: number
                 {member.name}
               </h3>
               <p 
-                className={`text-[#0A84FF] font-medium transition-all duration-500 ${isExpanded ? 'text-base md:text-lg mt-2' : 'text-sm mt-1'}`}
+                className={`text-[#6B8E23] font-medium transition-all duration-500 ${isExpanded ? 'text-base md:text-lg mt-2' : 'text-sm mt-1'}`}
               >
                 {member.position}
               </p>
@@ -876,7 +896,7 @@ function BoardMemberCard({ member, index }: { member: BoardMember; index: number
               {/* Featured Badge */}
               {member.featured && (
                 <span 
-                  className="inline-block mt-2 px-3 py-1 text-[10px] tracking-widest uppercase bg-[#0A84FF]/20 text-[#0A84FF] rounded-full border border-[#0A84FF]/30"
+                  className="inline-block mt-2 px-3 py-1 text-[10px] tracking-widest uppercase bg-[#6B8E23]/20 text-[#6B8E23] rounded-full border border-[#6B8E23]/30"
                 >
                   Master in Charge
                 </span>
@@ -916,9 +936,9 @@ function BoardMemberCard({ member, index }: { member: BoardMember; index: number
                   {member.linkedin && (
                     <a href={member.linkedin} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
                       <MagneticButton 
-                        className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-[#0A84FF]/20 hover:border-[#0A84FF]/30 transition-all duration-300"
+                        className="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-[#6B8E23]/20 hover:border-[#6B8E23]/30 transition-all duration-300"
                         strength={0.3}
-                        glowColor="rgba(10, 132, 255, 0.5)"
+                        glowColor="rgba(107, 142, 35, 0.5)"
                       >
                         <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
@@ -981,7 +1001,7 @@ function BoardMemberCard({ member, index }: { member: BoardMember; index: number
 
           {/* Hover Glow Effect */}
           <div 
-            className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-[#0A84FF]/0 via-[#0A84FF]/20 to-[#BF5AF2]/0 opacity-0 hover:opacity-100 blur-xl -z-10 transition-opacity duration-500"
+            className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-[#6B8E23]/0 via-[#6B8E23]/20 to-[#556B2F]/0 opacity-0 hover:opacity-100 blur-xl -z-10 transition-opacity duration-500"
           />
         </div>
       </GlassCard>
@@ -1037,7 +1057,7 @@ function BoardSection() {
       <div className="absolute inset-0">
         {/* Gradient Orbs */}
         <motion.div 
-          className="board-float absolute top-1/4 left-0 w-[600px] h-[600px] bg-[#0A84FF]/10 rounded-full blur-[200px]"
+          className="board-float absolute top-1/4 left-0 w-[600px] h-[600px] bg-[#6B8E23]/10 rounded-full blur-[200px]"
           animate={{ 
             x: [0, 50, 0],
             scale: [1, 1.1, 1]
@@ -1045,7 +1065,7 @@ function BoardSection() {
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div 
-          className="board-float absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-[#BF5AF2]/10 rounded-full blur-[200px]"
+          className="board-float absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-[#556B2F]/10 rounded-full blur-[200px]"
           animate={{ 
             x: [0, -50, 0],
             scale: [1.1, 1, 1.1]
@@ -1087,7 +1107,7 @@ function BoardSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: appleEase }}
-            className="text-[11px] md:text-xs uppercase tracking-[0.4em] text-[#0A84FF] font-medium mb-6 block"
+            className="text-[11px] md:text-xs uppercase tracking-[0.4em] text-[#6B8E23] font-medium mb-6 block"
           >
             Leadership
           </motion.span>
@@ -1099,7 +1119,7 @@ function BoardSection() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1.2, delay: 0.5, ease: appleEase }}
-              className="block text-transparent bg-clip-text bg-gradient-to-r from-[#0A84FF] via-[#BF5AF2] to-[#FF375F]"
+              className="block text-transparent bg-clip-text bg-gradient-to-r from-[#6B8E23] via-[#8FBC8F] to-[#556B2F]"
             >
               behind the code.
             </motion.span>
@@ -1127,7 +1147,7 @@ function BoardSection() {
               transition={{ duration: 0.8, ease: appleEase }}
               className="text-white text-xl md:text-2xl font-semibold mb-8 flex items-center gap-4"
             >
-              <span className="w-12 h-px bg-gradient-to-r from-[#0A84FF] to-transparent" />
+              <span className="w-12 h-px bg-gradient-to-r from-[#6B8E23] to-transparent" />
               Master in Charge
             </motion.h3>
             <div className="max-w-3xl mx-auto">
@@ -1145,7 +1165,7 @@ function BoardSection() {
             transition={{ duration: 0.8, ease: appleEase }}
             className="text-white text-xl md:text-2xl font-semibold mb-8 flex items-center gap-4"
           >
-            <span className="w-12 h-px bg-gradient-to-r from-[#BF5AF2] to-transparent" />
+            <span className="w-12 h-px bg-gradient-to-r from-[#8FBC8F] to-transparent" />
             Top Board
           </motion.h3>
           
@@ -1190,16 +1210,16 @@ function CTASection() {
   return (
     <section ref={sectionRef} className="relative w-full py-32 md:py-48 px-6 bg-black overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0A84FF]/10 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#6B8E23]/10 via-transparent to-transparent" />
       
       {/* Floating Particles */}
-      {[...Array(15)].map((_, i) => (
+      {CTA_PARTICLES.map((particle, i) => (
         <div
           key={i}
           className="cta-particle absolute w-2 h-2 bg-white/10 rounded-full"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: `${particle.left}%`,
+            top: `${particle.top}%`,
           }}
         />
       ))}
@@ -1210,7 +1230,7 @@ function CTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, ease: appleEase }}
-          className="text-[11px] md:text-xs uppercase tracking-[0.4em] text-[#0A84FF] font-medium mb-6 block"
+          className="text-[11px] md:text-xs uppercase tracking-[0.4em] text-[#6B8E23] font-medium mb-6 block"
         >
           Join Us
         </motion.span>
@@ -1222,7 +1242,7 @@ function CTASection() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 1.2, delay: 0.5, ease: appleEase }}
-            className="block text-transparent bg-clip-text bg-gradient-to-r from-[#0A84FF] via-[#BF5AF2] to-[#FF375F]"
+            className="block text-transparent bg-clip-text bg-gradient-to-r from-[#6B8E23] via-[#8FBC8F] to-[#556B2F]"
           >
             something amazing?
           </motion.span>
@@ -1247,9 +1267,9 @@ function CTASection() {
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <MagneticButton 
-            className="group px-8 py-4 rounded-full bg-[#0A84FF] text-white font-medium text-sm tracking-wide hover:bg-[#0A84FF]/90 transition-all duration-500"
+            className="group px-8 py-4 rounded-full bg-[#6B8E23] text-white font-medium text-sm tracking-wide hover:bg-[#6B8E23]/90 transition-all duration-500"
             strength={0.4}
-            glowColor="rgba(10, 132, 255, 0.6)"
+            glowColor="rgba(107, 142, 35, 0.6)"
           >
             <span className="flex items-center gap-3">
               Join the Community
