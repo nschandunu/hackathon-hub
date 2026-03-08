@@ -1,11 +1,14 @@
 import { prisma } from "@/lib/db";
 import EventForm from "./EventForm";
+import GalleryUploadForm from "./GalleryUploadForm";
 
 export default async function AdminDashboardPage() {
     const events = await prisma.event.findMany({
         include: { media: true },
         orderBy: { createdAt: "desc" },
     });
+
+    const eventOptions = events.map((e) => ({ id: e.id, title: e.title }));
 
     return (
         <div className="min-h-screen bg-background">
@@ -20,9 +23,13 @@ export default async function AdminDashboardPage() {
                     </p>
                 </div>
 
-                {/* Create Event Form */}
-                <div className="mb-10">
+                {/* Two-section forms */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+                    {/* Section A: Create New Event */}
                     <EventForm />
+
+                    {/* Section B: Update Event Gallery */}
+                    <GalleryUploadForm events={eventOptions} />
                 </div>
 
                 {/* Events List */}
@@ -63,8 +70,8 @@ export default async function AdminDashboardPage() {
                                                     </h3>
                                                     <span
                                                         className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${event.status === "UPCOMING"
-                                                                ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                                                                : "bg-muted text-muted-foreground"
+                                                            ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                                                            : "bg-muted text-muted-foreground"
                                                             }`}
                                                     >
                                                         {event.status}
