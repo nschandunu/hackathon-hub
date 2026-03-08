@@ -1,20 +1,20 @@
 import Navbar from "@/components/Navbar";
-import LandingPage from "@/components/LandingPage";
+import AboutPage from "@/components/AboutPage";
 import ClientLoader from "@/components/ClientLoader";
 
-export default function Home() {
+export default function About() {
   return (
     <>
       <ClientLoader />
       
-      {/* The New Gamified Navbar */}
+      {/* The Navigation */}
       <Navbar />
 
       <main className="min-h-screen flex flex-col bg-black text-white selection:bg-white selection:text-black">
         
-        {/* Inject our Animated Landing Page */}
+        {/* About Page Content */}
         <div className="flex-1 w-full flex flex-col items-center">
-          <LandingPage />
+          <AboutPage />
         </div>
       </main>
     </>
