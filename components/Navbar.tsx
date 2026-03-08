@@ -11,8 +11,8 @@ export default function Navbar() {
   ];
 
   const socialItems = [
-    { label: 'GitHub', link: 'https://github.com' },
-    { label: 'LinkedIn', link: 'https://linkedin.com' },
+    { label: 'GitHub', link: 'https://github.com/hackathon-hub-nsbm/' },
+    { label: 'LinkedIn', link: 'https://www.linkedin.com/company/hackathon-hub-nsbm/' },
   ];
 
   return (
