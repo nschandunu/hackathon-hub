@@ -1,5 +1,8 @@
 # Dockerfile
+<<<<<<< Updated upstream
 # Bumped to Node 20 to satisfy Next.js 14+ requirements
+=======
+>>>>>>> Stashed changes
 FROM node:20-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
