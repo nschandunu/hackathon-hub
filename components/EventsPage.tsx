@@ -1,11 +1,7 @@
 "use client";
 
-import React, { useRef, useState, useEffect, useMemo, Suspense } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Image, ScrollControls, Scroll, useScroll } from "@react-three/drei";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import * as THREE from "three";
-import { easing } from "maath";
 import type { EventWithMedia } from "@/app/actions/public-events";
 
 // ─── Constants ───────────────────────────────────────────────────────
@@ -22,129 +18,6 @@ interface EventCardData {
   imageUrl: string;
   slug: string;
   registrationLink: string | null;
-}
-
-// ─── 3D Gallery Card ─────────────────────────────────────────────────
-function GalleryCard({
-  data,
-  index,
-  total,
-  onSelect,
-}: {
-  data: EventCardData;
-  index: number;
-  total: number;
-  onSelect: (data: EventCardData) => void;
-}) {
-  const imgRef = useRef<THREE.Mesh>(null!);
-  const groupRef = useRef<THREE.Group>(null!);
-  const scroll = useScroll();
-  const { viewport } = useThree();
-  const [hovered, setHovered] = useState(false);
-
-  // Grid layout: 3 columns
-  const cols = Math.min(3, total);
-  const gap = 0.4;
-  const cardW = Math.min(3.2, (viewport.width - gap * (cols + 1)) / cols);
-  const cardH = cardW * 1.35;
-
-  const col = index % cols;
-  const row = Math.floor(index / cols);
-  const totalRows = Math.ceil(total / cols);
-
-  const xOffset =
-    col * (cardW + gap) - ((cols - 1) * (cardW + gap)) / 2;
-  const yStart = viewport.height / 2 - cardH / 2 - 1.5;
-  const yOffset = yStart - row * (cardH + gap);
-
-  // Total scroll height
-  const totalH = totalRows * (cardH + gap) + 2;
-
-  useFrame((_state, delta) => {
-    if (!groupRef.current) return;
-
-    const scrollOffset = scroll.offset * (totalH - viewport.height);
-    groupRef.current.position.set(xOffset, yOffset + scrollOffset, 0);
-
-    // Hover float effect
-    const targetZ = hovered ? 0.5 : 0;
-    groupRef.current.position.z = THREE.MathUtils.lerp(
-      groupRef.current.position.z,
-      targetZ,
-      0.1
-    );
-
-    // Subtle scale animation on hover
-    const targetScale = hovered ? 1.05 : 1;
-    easing.damp3(
-      groupRef.current.scale,
-      [targetScale, targetScale, 1],
-      0.15,
-      delta
-    );
-  });
-
-  return (
-    <group ref={groupRef}>
-      <Image
-        ref={imgRef}
-        url={data.imageUrl}
-        scale={[cardW, cardH]}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          setHovered(true);
-          document.body.style.cursor = "pointer";
-        }}
-        onPointerOut={() => {
-          setHovered(false);
-          document.body.style.cursor = "auto";
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelect(data);
-        }}
-        transparent
-      />
-      {/* Dark gradient overlay at bottom of card */}
-      <mesh position={[0, -cardH * 0.25, 0.01]} scale={[cardW, cardH * 0.5, 1]}>
-        <planeGeometry />
-        <meshBasicMaterial
-          color="#000000"
-          transparent
-          opacity={0.55}
-          depthWrite={false}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-// ─── Scene ───────────────────────────────────────────────────────────
-function Scene({
-  events,
-  onSelect,
-}: {
-  events: EventCardData[];
-  onSelect: (data: EventCardData) => void;
-}) {
-  const totalRows = Math.ceil(events.length / 3);
-  const pages = Math.max(1, totalRows * 0.65);
-
-  return (
-    <ScrollControls pages={pages} damping={0.25}>
-      <Scroll>
-        {events.map((event, i) => (
-          <GalleryCard
-            key={event.id}
-            data={event}
-            index={i}
-            total={events.length}
-            onSelect={onSelect}
-          />
-        ))}
-      </Scroll>
-    </ScrollControls>
-  );
 }
 
 // ─── Event Modal ─────────────────────────────────────────────────────
@@ -262,11 +135,6 @@ function EventModal({
       </motion.div>
     </motion.div>
   );
-}
-
-// ─── HTML Overlay Cards (on top of 3D canvas) ────────────────────────
-function EventInfoOverlay({ events }: { events: EventCardData[] }) {
-  return null; // Info is shown via the modal
 }
 
 // ─── Fallback Gallery (2D) for when no 3D or few events ──────────────
