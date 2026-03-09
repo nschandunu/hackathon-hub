@@ -10,7 +10,12 @@ export const metadata = {
 };
 
 export default async function Events() {
-  const events = await getAllEvents();
+  let events: Awaited<ReturnType<typeof getAllEvents>> = [];
+  try {
+    events = await getAllEvents();
+  } catch (error) {
+    console.error("Failed to fetch events:", error);
+  }
 
   return (
     <>
