@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import EventForm from "./EventForm";
 import GalleryUploadForm from "./GalleryUploadForm";
+import { LogoutButton } from "@/components/logout-button";
 
 export default async function AdminDashboardPage() {
     const events = await prisma.event.findMany({
@@ -14,13 +15,16 @@ export default async function AdminDashboardPage() {
         <div className="min-h-screen bg-background">
             <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-                        Admin Dashboard
-                    </h1>
-                    <p className="text-sm text-muted-foreground mt-1">
-                        Manage your hackathon events
-                    </p>
+                <div className="mb-8 flex items-start justify-between">
+                    <div>
+                        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+                            Admin Dashboard
+                        </h1>
+                        <p className="text-sm text-muted-foreground mt-1">
+                            Manage your hackathon events
+                        </p>
+                    </div>
+                    <LogoutButton />
                 </div>
 
                 {/* Two-section forms */}
