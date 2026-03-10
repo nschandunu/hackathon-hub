@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect, useState, useEffect } from 'react';
+import React, { useRef, useLayoutEffect, useState, useEffect, useMemo } from 'react';
 import {
   motion,
   useScroll,
@@ -27,6 +27,7 @@ interface VelocityTextProps {
   scrollerClassName?: string;
   parallaxStyle?: React.CSSProperties;
   scrollerStyle?: React.CSSProperties;
+  isVisible: boolean;
 }
 
 interface ScrollVelocityProps {
@@ -73,7 +74,125 @@ function useElementWidth<T extends HTMLElement>(ref: React.RefObject<T | null>):
   return width;
 }
 
-export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
+function wrap(min: number, max: number, v: number): number {
+  const range = max - min;
+  const mod = (((v - min) % range) + range) % range;
+  return mod + min;
+}
+
+// PERF: Extracted as top-level component for stable React.memo memoization
+const VelocityText = React.memo<VelocityTextProps>(({
+  children,
+  baseVelocity = 100,
+  scrollContainerRef,
+  className = '',
+  damping = 50,
+  stiffness = 400,
+  numCopies = 6,
+  velocityMapping,
+  parallaxClassName,
+  scrollerClassName,
+  parallaxStyle,
+  scrollerStyle,
+  isVisible
+}) => {
+  const baseX = useMotionValue(0);
+  const scrollOptions = scrollContainerRef ? { container: scrollContainerRef } : {};
+  const { scrollY } = useScroll(scrollOptions);
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(scrollVelocity, {
+    damping,
+    stiffness
+  });
+  const velocityFactor = useTransform(
+    smoothVelocity,
+    velocityMapping?.input || [0, 1000],
+    velocityMapping?.output || [0, 5],
+    { clamp: false }
+  );
+
+  const copyRef = useRef<HTMLSpanElement>(null);
+  const copyWidth = useElementWidth(copyRef);
+
+  const x = useTransform(baseX, v => {
+    if (copyWidth === 0) return '0px';
+    return `${wrap(-copyWidth, 0, v)}px`;
+  });
+
+  const directionFactor = useRef<number>(1);
+
+  // PERF: Only run animation frame when component is visible
+  useAnimationFrame((t, delta) => {
+    // PERF: Skip animation calculations when off-screen
+    if (!isVisible) return;
+
+    // PERF: Cap delta to 50ms to prevent large jumps on high-refresh-rate displays
+    // or after tab-switch resume
+    const clampedDelta = Math.min(delta, 50);
+
+    let moveBy = directionFactor.current * baseVelocity * (clampedDelta / 1000);
+
+    if (velocityFactor.get() < 0) {
+      directionFactor.current = -1;
+    } else if (velocityFactor.get() > 0) {
+      directionFactor.current = 1;
+    }
+
+    moveBy += directionFactor.current * moveBy * velocityFactor.get();
+    baseX.set(baseX.get() + moveBy);
+  });
+
+  // PERF: Memoize span repetition to avoid recalculating on every animation frame / render
+  const spans = useMemo(() => {
+    const result = [];
+    for (let i = 0; i < numCopies; i++) {
+      result.push(
+        <span
+          className={`flex-shrink-0 ${className}`}
+          key={i}
+          ref={i === 0 ? copyRef : null}
+          // PERF: GPU acceleration hints for text spans
+          style={{
+            transform: 'translateZ(0)',
+            backfaceVisibility: 'hidden'
+          }}
+        >
+          {children}
+        </span>
+      );
+    }
+    return result;
+  }, [numCopies, className, children]);
+
+  return (
+    <div
+      className={`${parallaxClassName} relative overflow-hidden`}
+      style={{
+        ...parallaxStyle,
+        // PERF: Contain layout to prevent reflows
+        contain: 'layout style paint'
+      }}
+    >
+      <motion.div
+        className={`${scrollerClassName} flex whitespace-nowrap text-center font-sans text-4xl font-bold tracking-[-0.02em] drop-shadow md:text-[5rem] md:leading-[5rem]`}
+        style={{
+          x,
+          ...scrollerStyle,
+          // PERF: Force GPU compositing for smooth transforms
+          willChange: 'transform',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden'
+        }}
+      >
+        {spans}
+      </motion.div>
+    </div>
+  );
+});
+
+VelocityText.displayName = 'VelocityText';
+
+function ScrollVelocityInner({
   scrollContainerRef,
   texts = [],
   velocity = 100,
@@ -81,12 +200,12 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
   damping = 50,
   stiffness = 400,
   numCopies = 6,
-  velocityMapping = { input: [0, 1000], output: [0, 5] },
+  velocityMapping = { input: [0, 1000], output: [0, 5] } as VelocityMapping,
   parallaxClassName,
   scrollerClassName,
   parallaxStyle,
   scrollerStyle
-}) => {
+}: ScrollVelocityProps) {
   // PERF: Track visibility of entire section to pause all text animations
   const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(true);
@@ -100,7 +219,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { 
+      {
         threshold: 0,
         rootMargin: '50px' // Start animating slightly before visible
       }
@@ -109,112 +228,6 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
     observer.observe(section);
     return () => observer.disconnect();
   }, []);
-
-  function VelocityText({
-    children,
-    baseVelocity = velocity,
-    scrollContainerRef,
-    className = '',
-    damping,
-    stiffness,
-    numCopies,
-    velocityMapping,
-    parallaxClassName,
-    scrollerClassName,
-    parallaxStyle,
-    scrollerStyle
-  }: VelocityTextProps & { isVisible: boolean }) {
-    const baseX = useMotionValue(0);
-    const scrollOptions = scrollContainerRef ? { container: scrollContainerRef } : {};
-    const { scrollY } = useScroll(scrollOptions);
-    const scrollVelocity = useVelocity(scrollY);
-    const smoothVelocity = useSpring(scrollVelocity, {
-      damping: damping ?? 50,
-      stiffness: stiffness ?? 400
-    });
-    const velocityFactor = useTransform(
-      smoothVelocity,
-      velocityMapping?.input || [0, 1000],
-      velocityMapping?.output || [0, 5],
-      { clamp: false }
-    );
-
-    const copyRef = useRef<HTMLSpanElement>(null);
-    const copyWidth = useElementWidth(copyRef);
-
-    function wrap(min: number, max: number, v: number): number {
-      const range = max - min;
-      const mod = (((v - min) % range) + range) % range;
-      return mod + min;
-    }
-
-    const x = useTransform(baseX, v => {
-      if (copyWidth === 0) return '0px';
-      return `${wrap(-copyWidth, 0, v)}px`;
-    });
-
-    const directionFactor = useRef<number>(1);
-    
-    // PERF: Only run animation frame when component is visible
-    useAnimationFrame((t, delta) => {
-      // PERF: Skip animation calculations when off-screen
-      if (!isVisible) return;
-      
-      let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
-
-      if (velocityFactor.get() < 0) {
-        directionFactor.current = -1;
-      } else if (velocityFactor.get() > 0) {
-        directionFactor.current = 1;
-      }
-
-      moveBy += directionFactor.current * moveBy * velocityFactor.get();
-      baseX.set(baseX.get() + moveBy);
-    });
-
-    const spans = [];
-    for (let i = 0; i < numCopies!; i++) {
-      spans.push(
-        <span 
-          className={`flex-shrink-0 ${className}`} 
-          key={i} 
-          ref={i === 0 ? copyRef : null}
-          // PERF: GPU acceleration hints for text spans
-          style={{ 
-            transform: 'translateZ(0)',
-            backfaceVisibility: 'hidden'
-          }}
-        >
-          {children}
-        </span>
-      );
-    }
-
-    return (
-      <div 
-        className={`${parallaxClassName} relative overflow-hidden`} 
-        style={{
-          ...parallaxStyle,
-          // PERF: Contain layout to prevent reflows
-          contain: 'layout style paint'
-        }}
-      >
-        <motion.div
-          className={`${scrollerClassName} flex whitespace-nowrap text-center font-sans text-4xl font-bold tracking-[-0.02em] drop-shadow md:text-[5rem] md:leading-[5rem]`}
-          style={{ 
-            x, 
-            ...scrollerStyle,
-            // PERF: Force GPU compositing for smooth transforms
-            willChange: 'transform',
-            transform: 'translateZ(0)',
-            backfaceVisibility: 'hidden'
-          }}
-        >
-          {spans}
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <section ref={sectionRef}>
@@ -239,6 +252,9 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
       ))}
     </section>
   );
-};
+}
+
+export const ScrollVelocity = React.memo(ScrollVelocityInner);
+ScrollVelocity.displayName = 'ScrollVelocity';
 
 export default ScrollVelocity;

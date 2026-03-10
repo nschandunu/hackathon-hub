@@ -986,7 +986,7 @@ const ContactSection = memo(function ContactSection() {
         </svg>
       ),
       label: "Email",
-      value: "hello@hackathonhub.dev",
+      value: "hh@nsbm.ac.lk",
       color: "#6B8E23"
     },
     {
@@ -997,7 +997,7 @@ const ContactSection = memo(function ContactSection() {
         </svg>
       ),
       label: "Location",
-      value: "NSBM Green University",
+      value: "B2 Floor, FOC, NSBM Green University",
       color: "#6B8E23"
     },
     {
@@ -1007,7 +1007,7 @@ const ContactSection = memo(function ContactSection() {
         </svg>
       ),
       label: "Response Time",
-      value: "Within 24 hours",
+      value: "Within 1 hour",
       color: "#8FBC8F"
     }
   ];
@@ -1236,33 +1236,43 @@ const ContactSection = memo(function ContactSection() {
                   className="group cursor-pointer"
                   style={{ transformStyle: 'preserve-3d' }}
                 >
-                  <GlassCard className="p-6 flex items-center gap-5 hover:border-white/[0.15] transition-all duration-500">
-                    <motion.div
-                      className="w-12 h-12 rounded-xl bg-white/[0.03] flex items-center justify-center border border-white/[0.08]"
-                      style={{ color: info.color }}
-                      whileHover={{
-                        scale: 1.1,
-                        backgroundColor: `${info.color}20`,
-                        boxShadow: `0 0 30px ${info.color}40`
-                      }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {info.icon}
-                    </motion.div>
-                    <div>
-                      <p className="text-[#86868B] text-xs uppercase tracking-wider mb-1">{info.label}</p>
-                      <p className="text-white text-sm font-medium">{info.value}</p>
+                  <GlassCard className="p-8 hover:border-white/[0.15] transition-all duration-500">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-10">
+                        <motion.div 
+                          className="w-12 h-12 rounded-xl bg-white/[0.03] flex-shrink-0 flex items-center justify-center border border-white/[0.08]"
+                          style={{ color: info.color }}
+                          animate={{ y: [0, -4, 0] }}
+                          whileHover={{ 
+                            scale: 1.15, 
+                            backgroundColor: `${info.color}20`,
+                            boxShadow: `0 0 30px ${info.color}40`
+                          }}
+                          transition={{ 
+                            y: { duration: 3, repeat: Infinity, ease: appleEase },
+                            scale: { duration: 0.3, ease: appleBounce },
+                            backgroundColor: { duration: 0.3 },
+                            boxShadow: { duration: 0.3 }
+                          }}
+                        >
+                          {info.icon}
+                        </motion.div>
+                        <div>
+                          <p className="text-[#86868B] text-xs uppercase tracking-wider mb-1 font-semibold">{info.label}</p>
+                          <p className="text-white text-sm font-medium">{info.value}</p>
+                        </div>
+                      </div>
+                      <motion.svg 
+                        className="w-5 h-5 text-[#86868B] flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                        animate={{ x: [0, 4, 0] }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: appleBounce }}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </motion.svg>
                     </div>
-                    <motion.svg
-                      className="w-5 h-5 text-[#86868B] ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      animate={{ x: [0, 3, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </motion.svg>
                   </GlassCard>
                 </motion.div>
               ))}
@@ -1542,8 +1552,8 @@ export default function LandingPage() {
             transition={{ duration: 1.4, delay: 1.1, ease: appleEase }}
             className="mt-10 flex flex-col sm:flex-row gap-4"
           >
-            <Link href="/join">
-              <MagneticButton
+            <Link href="/auth/sign-up">
+              <MagneticButton 
                 className="group relative px-12 py-5 rounded-full bg-white text-black font-semibold text-sm tracking-wide transition-all duration-700 hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] hover:bg-white"
                 strength={0.4}
                 glowColor="rgba(255, 255, 255, 0.5)"
@@ -1632,7 +1642,7 @@ export default function LandingPage() {
             'CODE  •  BUILD  •  LAUNCH  •'
           ]}
           velocity={35}
-          className="text-white/[0.06] font-semibold uppercase tracking-tight text-7xl md:text-9xl"
+          className="text-white/90 font-semibold uppercase tracking-tight text-7xl md:text-9xl"
         />
       </section>
 
@@ -1649,8 +1659,8 @@ export default function LandingPage() {
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
 
         <div className="max-w-7xl mx-auto px-6 py-20 md:py-28">
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-16">
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 mb-16">
 
             <motion.div
               className="md:col-span-1"
@@ -1689,9 +1699,8 @@ export default function LandingPage() {
             </motion.div>
 
             {[
-              { title: 'Explore', links: ['Events', 'Hackathons', 'Workshops', 'Community'] },
-              { title: 'Resources', links: ['Documentation', 'Blog', 'Tutorials', 'FAQ'] },
-              { title: 'Company', links: ['About', 'Team', 'Careers', 'Contact'] }
+              { title: 'Explore', links: ['Home', 'About', 'Events', 'Contact'] },
+              { title: 'Resources', links: ['Documentation', 'Blog', 'Tutorials', 'FAQ'] }
             ].map((column, colIndex) => (
               <motion.div
                 key={column.title}
@@ -1777,7 +1786,7 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ duration: 1, delay: 0.5 }}
             >
-              Crafted by Oshada, Asila, Senuka & Manuja
+              Crafted by Oshada, Asila and Senuka
             </motion.p>
           </div>
         </div>
