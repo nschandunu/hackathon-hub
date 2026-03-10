@@ -18,14 +18,13 @@ export default async function Events() {
   }
 
   return (
-    <>
-      <ClientLoader />
+    <ClientLoader>
       <Navbar />
       <main className="min-h-screen flex flex-col bg-black text-white selection:bg-white selection:text-black">
         <div className="flex-1 w-full flex flex-col items-center">
           <EventsPage events={events} />
         </div>
       </main>
-    </>
+    </ClientLoader>
   );
 }
