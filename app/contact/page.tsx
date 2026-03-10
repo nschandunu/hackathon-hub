@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import ContactForm from "./contact-form";
+import LiquidEther from "@/components/LiquidEther";
 
 
 import { Send, Mail } from "lucide-react";
@@ -12,7 +13,18 @@ export default function Contact() {
             
             <Navbar />
 
-            <main className="min-h-screen flex flex-col bg-black text-white selection:bg-white selection:text-black">
+            <main className="relative min-h-screen flex flex-col bg-black text-white selection:bg-white selection:text-black overflow-hidden">
+                <div className="absolute inset-0 z-0 opacity-15">
+                    <LiquidEther
+                        colors={['#6B8E23', '#8FBC8F', '#000000']}
+                        mouseForce={25}
+                        cursorSize={180}
+                        isViscous={true}
+                        viscous={60}
+                        autoDemo={true}
+                        autoSpeed={0.15}
+                    />
+                </div>
                 <style>{`
                     @keyframes float-bounce {
                         0%, 100% { transform: translateY(0px); }
@@ -45,7 +57,7 @@ export default function Contact() {
                     }
                 `}</style>
 
-                <div className="flex-1 w-full flex flex-col items-center">
+                <div className="relative z-10 flex-1 w-full flex flex-col items-center">
                     {/* ── Hero Header ── */}
                     <section className="w-full pt-32 pb-16 px-6 text-center relative overflow-hidden">
                         {/* Ambient glow */}
