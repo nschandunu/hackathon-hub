@@ -670,7 +670,6 @@ function AboutContentSection({ events = [] }: { events?: EventWithMedia[] }) {
                 }}
                 whileHover={{
                   scale: 1.1,
-                  opacity: 0.8,
                   filter: 'blur(0px)'
                 }}
                 transition={{ duration: 0.8, ease: appleEase }}
