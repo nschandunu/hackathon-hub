@@ -386,15 +386,23 @@ export default function EventsPage({
           slug: event.slug,
           registrationLink: event.registrationLink,
         };
-      })
-      // Sort latest events first
-      .sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
+      });
   }, [rawEvents]);
 
-  // Filter events based on active tab
+  // Separate, sort, and filter events based on active tab
   const filteredEvents = useMemo(() => {
-    if (activeFilter === "All") return events;
-    return events.filter((event) => event.status === activeFilter.toUpperCase());
+    const upcoming = events
+      .filter((e) => e.status === "UPCOMING")
+      .sort((a, b) => a.rawDate.getTime() - b.rawDate.getTime());
+
+    const past = events
+      .filter((e) => e.status === "PAST")
+      .sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
+
+    if (activeFilter === "Upcoming") return upcoming;
+    if (activeFilter === "Past") return past;
+    // "All" — upcoming first, then past
+    return [...upcoming, ...past];
   }, [events, activeFilter]);
 
   return (
