@@ -73,3 +73,22 @@ export async function submitContactForm(
         };
     }
 }
+
+export async function markMessageAsRead(id: string): Promise<ContactActionState> {
+    try {
+        await prisma.contactMessage.update({
+            where: { id },
+            data: { isRead: true },
+        });
+
+        revalidatePath("/admin/messages");
+
+        return { success: true };
+    } catch (err) {
+        console.error("Failed to mark message as read:", err);
+        return {
+            success: false,
+            error: err instanceof Error ? err.message : "Something went wrong.",
+        };
+    }
+}
