@@ -12,12 +12,17 @@ interface EventCardData {
   id: string;
   title: string;
   date: string;
+  rawDate: Date;
   location: string;
   description: string | null;
-  status: string;
+  status: "UPCOMING" | "PAST";
   imageUrl: string;
   slug: string;
   registrationLink: string | null;
+}
+
+function categorizeEvent(eventDate: Date): "UPCOMING" | "PAST" {
+  return eventDate >= new Date() ? "UPCOMING" : "PAST";
 }
 
 // ─── Event Modal ─────────────────────────────────────────────────────
@@ -79,11 +84,10 @@ function EventModal({
           {/* Status badge */}
           <div className="absolute top-4 left-4">
             <span
-              className={`px-3 py-1.5 rounded-full text-[10px] tracking-[0.2em] font-medium backdrop-blur-sm border ${
-                event.status === "UPCOMING"
+              className={`px-3 py-1.5 rounded-full text-[10px] tracking-[0.2em] font-medium backdrop-blur-sm border ${event.status === "UPCOMING"
                   ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
                   : "text-amber-400 bg-amber-500/10 border-amber-500/20"
-              }`}
+                }`}
             >
               {event.status}
             </span>
@@ -173,11 +177,10 @@ function FlatGallery({
               {/* Status badge */}
               <div className="absolute top-3 left-3">
                 <span
-                  className={`px-2.5 py-1 rounded-full text-[9px] tracking-[0.2em] font-medium backdrop-blur-md border ${
-                    event.status === "UPCOMING"
+                  className={`px-2.5 py-1 rounded-full text-[9px] tracking-[0.2em] font-medium backdrop-blur-md border ${event.status === "UPCOMING"
                       ? "text-emerald-400 bg-emerald-500/15 border-emerald-500/25"
                       : "text-amber-400 bg-amber-500/15 border-amber-500/25"
-                  }`}
+                    }`}
                 >
                   {event.status}
                 </span>
@@ -309,11 +312,10 @@ function HeroSection({
             <button
               key={tab}
               onClick={() => onFilterChange(tab)}
-              className={`px-5 py-2 rounded-full text-xs tracking-wider font-medium transition-all duration-300 cursor-pointer select-none ${
-                activeFilter === tab
+              className={`px-5 py-2 rounded-full text-xs tracking-wider font-medium transition-all duration-300 cursor-pointer select-none ${activeFilter === tab
                   ? "text-white bg-white/[0.12] shadow-sm"
                   : "text-white/60 hover:text-white hover:bg-white/[0.08]"
-              }`}
+                }`}
             >
               {tab}
             </button>
@@ -335,40 +337,44 @@ export default function EventsPage({
 
   // Transform events into card data
   const events: EventCardData[] = useMemo(() => {
-    return rawEvents.map((event) => {
-      // Use flyer as primary image, fallback to gallery, then placeholder
-      const flyer = event.media.find((m) => m.type === "FLYER");
-      const gallery = event.media.find((m) => m.type === "GALLERY");
-      const imageUrl =
-        flyer?.url ||
-        gallery?.url ||
-        `https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop`;
+    return rawEvents
+      .map((event) => {
+        // Use flyer as primary image, fallback to gallery, then placeholder
+        const flyer = event.media.find((m) => m.type === "FLYER");
+        const gallery = event.media.find((m) => m.type === "GALLERY");
+        const imageUrl =
+          flyer?.url ||
+          gallery?.url ||
+          `https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop`;
 
-      return {
-        id: event.id,
-        title: event.title,
-        date: new Date(event.date).toLocaleDateString("en-US", {
-          weekday: "short",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }),
-        location: event.location,
-        description: event.description,
-        status: event.status,
-        imageUrl,
-        slug: event.slug,
-        registrationLink: event.registrationLink,
-      };
-    });
+        const rawDate = new Date(event.date);
+
+        return {
+          id: event.id,
+          title: event.title,
+          date: rawDate.toLocaleDateString("en-US", {
+            weekday: "short",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          rawDate,
+          location: event.location,
+          description: event.description,
+          status: categorizeEvent(rawDate),
+          imageUrl,
+          slug: event.slug,
+          registrationLink: event.registrationLink,
+        };
+      })
+      // Sort latest events first
+      .sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime());
   }, [rawEvents]);
 
   // Filter events based on active tab
   const filteredEvents = useMemo(() => {
     if (activeFilter === "All") return events;
-    return events.filter(
-      (event) => event.status === activeFilter.toUpperCase()
-    );
+    return events.filter((event) => event.status === activeFilter.toUpperCase());
   }, [events, activeFilter]);
 
   return (
