@@ -127,7 +127,7 @@ export default function Contact() {
                         <div className="w-full max-w-lg mx-auto lg:mx-0">
                             <div className="rounded-3xl border border-white/10 bg-zinc-900/50 backdrop-blur-md p-8 shadow-2xl relative overflow-hidden">
                                 {/* Decor */}
-                                <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-indigo-500/20 blur-[60px]"></div>
+                                <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-indigo-500/20 blur-[60px] pointer-events-none"></div>
                                 
                                 {submitStatus === 'success' ? (
                                     <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center animate-in fade-in zoom-in duration-500">
