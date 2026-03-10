@@ -1472,7 +1472,7 @@ export default function LandingPage() {
             transition={{ duration: 1.4, delay: 1.1, ease: appleEase }}
             className="mt-10 flex flex-col sm:flex-row gap-4"
           >
-            <Link href="/join">
+            <Link href="/auth/sign-up">
               <MagneticButton 
                 className="group relative px-12 py-5 rounded-full bg-white text-black font-semibold text-sm tracking-wide transition-all duration-700 hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] hover:bg-white"
                 strength={0.4}
@@ -1562,7 +1562,7 @@ export default function LandingPage() {
             'CODE  •  BUILD  •  LAUNCH  •'
           ]} 
           velocity={35}
-          className="text-white/[0.06] font-semibold uppercase tracking-tight text-7xl md:text-9xl"
+          className="text-white/90 font-semibold uppercase tracking-tight text-7xl md:text-9xl"
         />
       </section>
 
@@ -1707,7 +1707,7 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ duration: 1, delay: 0.5 }}
             >
-              Crafted by Oshada, Asila, Senuka & Manuja
+              Crafted by Oshada, Asila and Senuka
             </motion.p>
           </div>
         </div>
