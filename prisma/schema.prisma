@@ -40,3 +40,19 @@ model Media {
   eventId String    @db.Uuid
   event   Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
+
+enum ContactCategory {
+  GENERAL
+  SPONSORSHIP
+  PARTNERSHIP
+  FEEDBACK
+}
+
+model ContactMessage {
+  id        String          @id @default(uuid()) @db.Uuid
+  name      String
+  email     String
+  category  ContactCategory
+  message   String          @db.Text
+  createdAt DateTime        @default(now())
+}
