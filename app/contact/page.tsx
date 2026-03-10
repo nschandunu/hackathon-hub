@@ -64,7 +64,7 @@ export default function Contact() {
                         <div className="flex flex-col gap-6">
                             {/* Discord Card */}
                             <Link
-                                href="#"
+                                href="https://discord.gg/wBpwkVmW?event=1480134383334850570"
                                 className="group relative rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 transition-all duration-500 hover:border-indigo-500/30 hover:bg-indigo-500/[0.04] hover:shadow-[0_0_40px_-12px_rgba(99,102,241,0.25)] overflow-hidden"
                             >
                                 {/* Hover gradient wash */}
@@ -96,7 +96,7 @@ export default function Contact() {
 
                             {/* WhatsApp Community Card */}
                             <Link
-                                href="#"
+                                href="https://whatsapp.com/channel/0029Vb2kqVT65yD5eA31FO2i"
                                 className="group relative rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 transition-all duration-500 hover:border-emerald-500/30 hover:bg-emerald-500/[0.04] hover:shadow-[0_0_40px_-12px_rgba(16,185,129,0.25)] overflow-hidden"
                             >
                                 {/* Hover gradient wash */}
