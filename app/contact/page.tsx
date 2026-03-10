@@ -58,23 +58,8 @@ export default function Contact() {
                 `}</style>
 
                 <div className="relative z-10 flex-1 w-full flex flex-col items-center">
-                    {/* ── Hero Header ── */}
-                    <section className="w-full pt-32 pb-16 px-6 text-center relative overflow-hidden">
-                        {/* Ambient glow */}
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gradient-radial from-indigo-500/15 via-transparent to-transparent pointer-events-none animate-pulse-glow" />
-
-                        <h1 className="relative text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-r from-white via-white/90 to-white/60 bg-clip-text text-transparent">
-                            Get in Touch
-                        </h1>
-                        <p className="relative mt-5 max-w-xl mx-auto text-lg md:text-xl text-white/50 leading-relaxed">
-                            Have questions about the hackathon? Want to partner with us or need
-                            help getting started? Reach out — our organising team is always
-                            happy to help.
-                        </p>
-                    </section>
-
                     {/* ── Content Grid ── */}
-                    <section className="w-full max-w-6xl mx-auto px-6 pb-24 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <section className="w-full max-w-6xl mx-auto px-6 pt-32 pb-24 grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* ─── Left Column: Community Cards ─── */}
                         <div className="flex flex-col gap-6">
                             {/* Discord Card */}
