@@ -16,7 +16,7 @@ export default async function AdminDashboardPage() {
     });
 
     const eventOptions = events.map((e) => ({ id: e.id, title: e.title }));
-        const unreadMessageCount = await prisma.contactMessage.count({
+    const unreadMessageCount = await prisma.contactMessage.count({
         where: { isRead: false },
     });
 
@@ -39,8 +39,14 @@ export default async function AdminDashboardPage() {
                             Manage your hackathon events
                         </p>
                     </div>
-                    
+
                     <div className="flex items-center gap-3">
+                        <Link
+                            href="/admin/board"
+                            className="relative inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                        >
+                            Board Members
+                        </Link>
                         <Link
                             href="/admin/messages"
                             className="relative inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"

@@ -2,13 +2,21 @@ import Navbar from "@/components/Navbar";
 import AboutPage from "@/components/AboutPage";
 import ClientLoader from "@/components/ClientLoader";
 import { getAllEvents } from "@/app/actions/public-events";
+import { getBoardMembers } from "@/app/actions/public-board";
 
 export default async function About() {
   let events: Awaited<ReturnType<typeof getAllEvents>> = [];
+  let boardMembers: Awaited<ReturnType<typeof getBoardMembers>> = [];
+
   try {
-    events = await getAllEvents();
+    const [eventsData, boardMembersData] = await Promise.all([
+      getAllEvents(),
+      getBoardMembers()
+    ]);
+    events = eventsData;
+    boardMembers = boardMembersData;
   } catch (error) {
-    console.error("Failed to fetch events:", error);
+    console.error("Failed to fetch data:", error);
   }
 
   return (
@@ -20,7 +28,7 @@ export default async function About() {
 
         {/* About Page Content */}
         <div className="flex-1 w-full flex flex-col items-center">
-          <AboutPage events={events} />
+          <AboutPage events={events} boardMembers={boardMembers} />
         </div>
       </main>
     </ClientLoader>

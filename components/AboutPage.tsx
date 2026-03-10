@@ -718,165 +718,24 @@ function AboutContentSection({ events = [] }: { events?: EventWithMedia[] }) {
 
 // ==================== BOARD MEMBER DATA ====================
 
-interface BoardMember {
-  id: number;
+interface BoardMemberProps {
+  id: string;
   name: string;
   position: string;
   description: string;
-  linkedin: string;
-  twitter?: string;
-  github?: string;
-  image: string;
+  linkedin: string | null;
+  twitter?: string | null;
+  github?: string | null;
+  imageUrl: string;
   featured?: boolean;
 }
 
-const BOARD_MEMBERS: BoardMember[] = [
-  {
-    id: 1,
-    name: "Dr. James Wellington",
-    position: "Master in Charge",
-    description: "Visionary leader with 15+ years in tech education. Dr. Wellington has been instrumental in shaping the computing society into the thriving community it is today. His passion for innovation and student development has produced countless successful tech professionals.",
-    linkedin: "https://linkedin.com",
-    twitter: "https://twitter.com",
-    image: "/steve.jpeg",
-    featured: true
-  },
-  {
-    id: 2,
-    name: "Sarah Chen",
-    position: "President",
-    description: "Computer Science senior with expertise in AI/ML. Sarah leads the society with unwavering dedication and has organized multiple successful hackathons. Her leadership has doubled member engagement this year.",
-    linkedin: "https://linkedin.com",
-    github: "https://github.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 3,
-    name: "Michael Frost",
-    position: "Vice President",
-    description: "Full-stack developer and cloud architecture enthusiast. Michael oversees technical operations and mentor programs, ensuring every member has access to cutting-edge resources and guidance.",
-    linkedin: "https://linkedin.com",
-    github: "https://github.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 4,
-    name: "Emily Rodriguez",
-    position: "Secretary",
-    description: "Detail-oriented organizer with a passion for community building. Emily manages communications and ensures seamless coordination across all society activities and events.",
-    linkedin: "https://linkedin.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 5,
-    name: "David Park",
-    position: "Treasurer",
-    description: "Finance and tech dual major. David manages the society's resources with precision, enabling ambitious projects and ensuring sustainable growth for years to come.",
-    linkedin: "https://linkedin.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 6,
-    name: "Amanda Foster",
-    position: "Events Director",
-    description: "Creative strategist behind our flagship events. Amanda transforms ideas into unforgettable experiences, from intimate workshops to large-scale hackathons that attract participants nationwide.",
-    linkedin: "https://linkedin.com",
-    twitter: "https://twitter.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 7,
-    name: "Ryan Mitchell",
-    position: "Technical Lead",
-    description: "Systems architect and open-source contributor. Ryan drives technical excellence across all projects, maintaining our infrastructure and mentoring aspiring developers.",
-    linkedin: "https://linkedin.com",
-    github: "https://github.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 8,
-    name: "Jessica Wong",
-    position: "Marketing Director",
-    description: "Digital marketing expert and content strategist. Jessica has grown our social media presence by 300% and built partnerships with leading tech companies.",
-    linkedin: "https://linkedin.com",
-    twitter: "https://twitter.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 9,
-    name: "Christopher Lee",
-    position: "Community Manager",
-    description: "People person with strong organizational skills. Christopher nurtures our member community, organizing networking events and ensuring everyone feels welcome and supported.",
-    linkedin: "https://linkedin.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 10,
-    name: "Natalie Brooks",
-    position: "Workshop Coordinator",
-    description: "Educator and curriculum designer. Natalie develops and delivers hands-on technical workshops that have helped hundreds of students gain practical skills in emerging technologies.",
-    linkedin: "https://linkedin.com",
-    github: "https://github.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 11,
-    name: "Alexander Kim",
-    position: "Sponsorship Lead",
-    description: "Business development specialist. Alexander bridges the gap between academia and industry, securing partnerships that provide members with internships, mentorship, and resources.",
-    linkedin: "https://linkedin.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 12,
-    name: "Sophia Martinez",
-    position: "Design Director",
-    description: "UI/UX designer with an eye for aesthetics. Sophia crafts the visual identity of all society projects and ensures every touchpoint reflects our commitment to excellence.",
-    linkedin: "https://linkedin.com",
-    twitter: "https://twitter.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 13,
-    name: "Daniel Thompson",
-    position: "Hackathon Coordinator",
-    description: "Competition veteran and event specialist. Daniel orchestrates our hackathons with military precision, creating experiences that challenge and inspire participants.",
-    linkedin: "https://linkedin.com",
-    github: "https://github.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 14,
-    name: "Rachel Green",
-    position: "Outreach Coordinator",
-    description: "Passionate advocate for tech diversity. Rachel runs programs that introduce underrepresented groups to computing, expanding our community and fostering inclusion.",
-    linkedin: "https://linkedin.com",
-    twitter: "https://twitter.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 15,
-    name: "Kevin Patel",
-    position: "Documentation Lead",
-    description: "Technical writer and knowledge manager. Kevin ensures all projects are well-documented and creates resources that help members learn and contribute effectively.",
-    linkedin: "https://linkedin.com",
-    github: "https://github.com",
-    image: "/steve.jpeg"
-  },
-  {
-    id: 16,
-    name: "Olivia Anderson",
-    position: "Social Media Manager",
-    description: "Creative content creator and community voice. Olivia manages our digital presence, sharing stories that inspire and connect our vibrant tech community.",
-    linkedin: "https://linkedin.com",
-    twitter: "https://twitter.com",
-    image: "/steve.jpeg"
-  }
-];
+// ==================== BOARD MEMBER CARD COMPONENT ====================
+// Removed hardcoded board members array
 
 // ==================== BOARD MEMBER CARD COMPONENT ====================
 
-function BoardMemberCard({ member, index }: { member: BoardMember; index: number }) {
+function BoardMemberCard({ member, index }: { member: BoardMemberProps; index: number }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(cardRef, { once: true, margin: "-50px" });
@@ -903,7 +762,7 @@ function BoardMemberCard({ member, index }: { member: BoardMember; index: number
               className={`relative ${isExpanded ? 'w-32 h-32 md:w-40 md:h-40 mx-auto' : 'w-16 h-16 md:w-20 md:h-20'} rounded-full overflow-hidden flex-shrink-0 transition-all duration-500`}
             >
               <Image
-                src={member.image}
+                src={member.imageUrl}
                 alt={member.name}
                 fill
                 className="object-cover"
@@ -1060,7 +919,7 @@ function BoardMemberCard({ member, index }: { member: BoardMember; index: number
 
 // ==================== BOARD SECTION ====================
 
-function BoardSection() {
+function BoardSection({ boardMembers = [] }: { boardMembers: BoardMemberProps[] }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -1097,8 +956,8 @@ function BoardSection() {
   }, []);
 
   // Separate featured member (Master in Charge) from others
-  const masterInCharge = BOARD_MEMBERS.find(m => m.featured);
-  const otherMembers = BOARD_MEMBERS.filter(m => !m.featured);
+  const masterInCharge = boardMembers.find(m => m.featured);
+  const otherMembers = boardMembers.filter(m => !m.featured);
 
   return (
     <section ref={sectionRef} className="relative w-full py-32 md:py-48 px-6 bg-black overflow-hidden">
@@ -1399,12 +1258,12 @@ function Footer() {
 
 // ==================== MAIN COMPONENT ====================
 
-export default function AboutPage({ events = [] }: { events?: EventWithMedia[] }) {
+export default function AboutPage({ events = [], boardMembers = [] }: { events?: EventWithMedia[], boardMembers?: BoardMemberProps[] }) {
   return (
     <div className="w-full">
       <HeroSection />
       <AboutContentSection events={events} />
-      <BoardSection />
+      <BoardSection boardMembers={boardMembers} />
       <CTASection />
       <Footer />
     </div>
