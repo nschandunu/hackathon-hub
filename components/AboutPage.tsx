@@ -537,8 +537,16 @@ function AboutContentSection({ events = [] }: { events?: EventWithMedia[] }) {
                     viewport={{ once: true }}
                     transition={{ delay: 0.3 }}
                   >
-                    <span className="text-[#6B8E23] text-xs tracking-[0.2em] uppercase font-medium">Established 2020</span>
-                    <h3 className="text-white text-2xl md:text-3xl font-semibold mt-2">Where Ideas Come Alive</h3>
+                    <span className="text-[#6B8E23] text-xs tracking-[0.2em] uppercase font-medium">
+                      {events[0] ? new Date(events[0].date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      }) : "Established 2020"}
+                    </span>
+                    <h3 className="text-white text-2xl md:text-3xl font-semibold mt-2">
+                      {events[0]?.title || "Where Ideas Come Alive"}
+                    </h3>
                   </motion.div>
 
                   {/* Shine Effect */}
@@ -625,12 +633,19 @@ function AboutContentSection({ events = [] }: { events?: EventWithMedia[] }) {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
 
-                    {/* Hover Overlay */}
+                    {/* Content Overlay */}
                     <motion.div
-                      className="absolute inset-0 bg-[#6B8E23]/20 opacity-0"
-                      whileHover={{ opacity: 1 }}
+                      className="absolute inset-0 flex flex-col justify-end p-6 z-20"
+                      whileHover={{ backgroundColor: "rgba(107, 142, 35, 0.4)" }}
                       transition={{ duration: 0.3 }}
-                    />
+                    >
+                      <h4 className="text-white font-semibold text-lg md:text-xl drop-shadow-lg">
+                        {events[index + 1]?.title || `Event ${index + 1}`}
+                      </h4>
+                      <p suppressHydrationWarning className="text-white/90 text-sm mt-1 drop-shadow-md">
+                        {events[index + 1] ? new Date(events[index + 1].date).toLocaleDateString() : "View details"}
+                      </p>
+                    </motion.div>
                   </GlassCard>
                 </div>
               ))}
@@ -672,7 +687,7 @@ function AboutContentSection({ events = [] }: { events?: EventWithMedia[] }) {
                     viewport={{ once: true }}
                     transition={{ duration: 1, delay: 0.3, ease: appleEase }}
                   >
-                    Building Together.
+                    {events[3]?.title || "Building Together."}
                   </motion.h3>
                   <motion.p
                     className="text-white/70 text-base sm:text-lg md:text-xl mt-4 max-w-xl mx-auto px-4"
@@ -681,7 +696,7 @@ function AboutContentSection({ events = [] }: { events?: EventWithMedia[] }) {
                     viewport={{ once: true }}
                     transition={{ duration: 1, delay: 0.5, ease: appleEase }}
                   >
-                    Join a community of innovators, dreamers, and builders
+                    {events[3] ? new Date(events[3].date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : "Join a community of innovators, dreamers, and builders"}
                   </motion.p>
                 </div>
               </div>
