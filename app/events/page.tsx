@@ -2,7 +2,6 @@ import Navbar from "@/components/Navbar";
 import ClientLoader from "@/components/ClientLoader";
 import EventsPage from "@/components/EventsPage";
 import { getAllEvents } from "@/app/actions/public-events";
-import GlassSurface from "@/components/glass-surface";
 
 export const metadata = {
   title: "Events | Hackathon Hub",

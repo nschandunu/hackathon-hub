@@ -238,8 +238,17 @@ function FlatGallery({
   );
 }
 
+// ─── Filter type ─────────────────────────────────────────────────────
+type FilterTab = "All" | "Upcoming" | "Past";
+
 // ─── Hero Section ────────────────────────────────────────────────────
-function HeroSection() {
+function HeroSection({
+  activeFilter,
+  onFilterChange,
+}: {
+  activeFilter: FilterTab;
+  onFilterChange: (tab: FilterTab) => void;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true });
 
@@ -296,13 +305,18 @@ function HeroSection() {
         className="mt-10"
       >
         <div className="inline-flex items-center gap-1 p-1 rounded-full bg-white/[0.04] backdrop-blur-xl border border-white/[0.08]">
-          {["All", "Upcoming", "Past"].map((tab) => (
-            <span
+          {(["All", "Upcoming", "Past"] as FilterTab[]).map((tab) => (
+            <button
               key={tab}
-              className="px-5 py-2 rounded-full text-xs tracking-wider font-medium text-white/60 hover:text-white hover:bg-white/[0.08] transition-all duration-300 cursor-default select-none"
+              onClick={() => onFilterChange(tab)}
+              className={`px-5 py-2 rounded-full text-xs tracking-wider font-medium transition-all duration-300 cursor-pointer select-none ${
+                activeFilter === tab
+                  ? "text-white bg-white/[0.12] shadow-sm"
+                  : "text-white/60 hover:text-white hover:bg-white/[0.08]"
+              }`}
             >
               {tab}
-            </span>
+            </button>
           ))}
         </div>
       </motion.div>
@@ -317,6 +331,7 @@ export default function EventsPage({
   events: EventWithMedia[];
 }) {
   const [selectedEvent, setSelectedEvent] = useState<EventCardData | null>(null);
+  const [activeFilter, setActiveFilter] = useState<FilterTab>("All");
 
   // Transform events into card data
   const events: EventCardData[] = useMemo(() => {
@@ -348,14 +363,22 @@ export default function EventsPage({
     });
   }, [rawEvents]);
 
+  // Filter events based on active tab
+  const filteredEvents = useMemo(() => {
+    if (activeFilter === "All") return events;
+    return events.filter(
+      (event) => event.status === activeFilter.toUpperCase()
+    );
+  }, [events, activeFilter]);
+
   return (
     <div className="w-full min-h-screen bg-black">
       {/* Hero */}
-      <HeroSection />
+      <HeroSection activeFilter={activeFilter} onFilterChange={setActiveFilter} />
 
       {/* Gallery */}
-      {events.length > 0 ? (
-        <FlatGallery events={events} onSelect={setSelectedEvent} />
+      {filteredEvents.length > 0 ? (
+        <FlatGallery events={filteredEvents} onSelect={setSelectedEvent} />
       ) : (
         <div className="flex flex-col items-center justify-center py-32 px-6">
           <motion.div
