@@ -8,6 +8,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import LiquidEther from './LiquidEther';
 import ScrollVelocity from './ScrollVelocity';
 import ScrollReveal from './ScrollReveal';
+import { submitContactForm } from '@/app/actions/contact-actions';
+import { CheckCircle } from 'lucide-react';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -27,8 +29,8 @@ type MagneticButtonProps = {
   glowColor?: string;
 } & Omit<React.ComponentPropsWithoutRef<'button'>, 'children' | 'className' | MotionConflictingProps>;
 
-const MagneticButton = memo(function MagneticButton({ 
-  children, 
+const MagneticButton = memo(function MagneticButton({
+  children,
   className = "",
   strength = 0.3,
   glowColor = "rgba(107, 142, 35, 0.4)",
@@ -80,8 +82,8 @@ const MagneticButton = memo(function MagneticButton({
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
-      style={{ 
-        x: springX, 
+      style={{
+        x: springX,
         y: springY,
         // PERF: GPU acceleration hints
         willChange: 'transform',
@@ -91,9 +93,9 @@ const MagneticButton = memo(function MagneticButton({
       className={`${className} relative overflow-hidden`}
     >
       {/* PERF: Simplify glow animation to opacity only (no rotate keyframes) */}
-      <motion.div 
+      <motion.div
         className="absolute -inset-[1px] rounded-full opacity-0"
-        style={{ 
+        style={{
           background: `linear-gradient(90deg, ${glowColor}, transparent, ${glowColor})`,
           filter: 'blur(4px)',
           transform: 'translateZ(0)'
@@ -101,31 +103,31 @@ const MagneticButton = memo(function MagneticButton({
         animate={{ opacity: isHovered ? 0.8 : 0 }}
         transition={{ duration: 0.3 }}
       />
-      
+
       {/* PERF: Static radial gradient, animate opacity only */}
-      <motion.div 
+      <motion.div
         className="absolute inset-0 rounded-full"
-        style={{ 
+        style={{
           background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
           transform: 'translateZ(0) scale(1.5)'
         }}
         animate={{ opacity: isHovered ? 0.3 : 0 }}
         transition={{ duration: 0.4, ease: appleEase }}
       />
-      
+
       {children}
     </motion.button>
   );
 });
 
 // PERF: Memoize TextReveal and use GPU-accelerated transforms
-const TextReveal = memo(function TextReveal({ 
-  children, 
+const TextReveal = memo(function TextReveal({
+  children,
   className = "",
   delay = 0,
   staggerDelay = 0.03
-}: { 
-  children: string; 
+}: {
+  children: string;
   className?: string;
   delay?: number;
   staggerDelay?: number;
@@ -160,12 +162,12 @@ const TextReveal = memo(function TextReveal({
 
 // PERF: Optimize CharacterReveal - remove filter: blur animation (CPU intensive)
 // Use opacity-only fade instead for similar visual effect
-const CharacterReveal = memo(function CharacterReveal({ 
-  children, 
+const CharacterReveal = memo(function CharacterReveal({
+  children,
   className = "",
-  delay = 0 
-}: { 
-  children: string; 
+  delay = 0
+}: {
+  children: string;
   className?: string;
   delay?: number;
 }) {
@@ -197,12 +199,12 @@ const CharacterReveal = memo(function CharacterReveal({
 });
 
 // PERF: Memoize ParallaxSection
-const ParallaxSection = memo(function ParallaxSection({ 
-  children, 
+const ParallaxSection = memo(function ParallaxSection({
+  children,
   className = "",
-  speed = 0.5 
-}: { 
-  children: React.ReactNode; 
+  speed = 0.5
+}: {
+  children: React.ReactNode;
   className?: string;
   speed?: number;
 }) {
@@ -211,19 +213,19 @@ const ParallaxSection = memo(function ParallaxSection({
     target: ref,
     offset: ["start end", "end start"]
   });
-  
+
   const y = useTransform(scrollYProgress, [0, 1], [100 * speed, -100 * speed]);
   const smoothY = useSpring(y, { stiffness: 100, damping: 30 });
 
   return (
-    <motion.div 
-      ref={ref} 
-      style={{ 
+    <motion.div
+      ref={ref}
+      style={{
         y: smoothY,
         // PERF: GPU acceleration
         willChange: 'transform',
         transform: 'translateZ(0)'
-      }} 
+      }}
       className={className}
     >
       {children}
@@ -232,12 +234,12 @@ const ParallaxSection = memo(function ParallaxSection({
 });
 
 // PERF: Memoize StaggerContainer
-const StaggerContainer = memo(function StaggerContainer({ 
-  children, 
+const StaggerContainer = memo(function StaggerContainer({
+  children,
   className = "",
-  staggerDelay = 0.1 
-}: { 
-  children: React.ReactNode; 
+  staggerDelay = 0.1
+}: {
+  children: React.ReactNode;
   className?: string;
   staggerDelay?: number;
 }) {
@@ -245,8 +247,8 @@ const StaggerContainer = memo(function StaggerContainer({
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
   return (
-    <motion.div 
-      ref={ref} 
+    <motion.div
+      ref={ref}
       className={className}
       initial="hidden"
       animate={isInView ? "visible" : "hidden"}
@@ -265,8 +267,8 @@ const StaggerContainer = memo(function StaggerContainer({
 
 const fadeUpVariant = {
   hidden: { opacity: 0, y: 60 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: { duration: 1, ease: appleEase }
   }
@@ -345,16 +347,16 @@ const containerVariants = {
 
 // PERF: Removed filter: blur animation - uses opacity + transform only (GPU accelerated)
 const cardVariants = {
-  hidden: { 
-    opacity: 0, 
+  hidden: {
+    opacity: 0,
     y: 80,
     scale: 0.92
   },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
+  visible: {
+    opacity: 1,
+    y: 0,
     scale: 1,
-    transition: { 
+    transition: {
       duration: 1,
       ease: appleEase
     }
@@ -371,15 +373,15 @@ function GlassCard({ children, className = "" }: { children: React.ReactNode; cl
   );
 }
 
-function SectionTitle({ 
-  label, 
-  title, 
-  highlight, 
-  description 
-}: { 
-  label: string; 
-  title: string; 
-  highlight: string; 
+function SectionTitle({
+  label,
+  title,
+  highlight,
+  description
+}: {
+  label: string;
+  title: string;
+  highlight: string;
   description: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -387,7 +389,7 @@ function SectionTitle({
 
   return (
     <div ref={ref} className="flex flex-col items-center text-center mb-20 md:mb-28">
-      <motion.span 
+      <motion.span
         initial={{ opacity: 0, y: 20 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, ease: appleEase }}
@@ -395,10 +397,10 @@ function SectionTitle({
       >
         {label}
       </motion.span>
-      
+
       <h2 className="text-white text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tight leading-[0.95]">
         <TextReveal delay={0.2}>{title}</TextReveal>
-        <motion.span 
+        <motion.span
           initial={{ opacity: 0, scale: 0.9 }}
           animate={isInView ? { opacity: 1, scale: 1 } : {}}
           transition={{ duration: 1.2, delay: 0.5, ease: appleEase }}
@@ -407,8 +409,8 @@ function SectionTitle({
           {highlight}
         </motion.span>
       </h2>
-      
-      <motion.p 
+
+      <motion.p
         initial={{ opacity: 0, y: 30 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 1, delay: 0.7, ease: appleEase }}
@@ -429,10 +431,10 @@ const BentoEvents = memo(function BentoEvents() {
 
   useEffect(() => {
     if (!sectionRef.current) return;
-    
+
     const ctx = gsap.context(() => {
       // PERF: Add force3D for GPU acceleration
-      gsap.fromTo(sectionRef.current, 
+      gsap.fromTo(sectionRef.current,
         { scale: 0.9, opacity: 0.5 },
         {
           scale: 1,
@@ -451,14 +453,14 @@ const BentoEvents = memo(function BentoEvents() {
 
       cardsRef.current.forEach((card, index) => {
         if (!card) return;
-        
+
         // PERF: Add force3D for GPU acceleration
-        gsap.fromTo(card, 
-          { 
-            y: 100, 
-            opacity: 0, 
+        gsap.fromTo(card,
+          {
+            y: 100,
+            opacity: 0,
             rotateX: 15,
-            scale: 0.9 
+            scale: 0.9
           },
           {
             y: 0,
@@ -491,10 +493,10 @@ const BentoEvents = memo(function BentoEvents() {
             const y = e.clientY - rect.top;
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
-            
+
             const rotateX = (y - centerY) / 20;
             const rotateY = (centerX - x) / 20;
-            
+
             gsap.to(card, {
               rotateX: rotateX,
               rotateY: rotateY,
@@ -533,15 +535,15 @@ const BentoEvents = memo(function BentoEvents() {
   }, []);
 
   return (
-    <section 
+    <section
       id="events"
-      ref={sectionRef} 
+      ref={sectionRef}
       className="w-full bg-black py-40 md:py-52 px-6 flex flex-col items-center overflow-hidden"
       style={{ perspective: '2000px' }}
     >
       <div className="max-w-7xl w-full">
-        
-        <SectionTitle 
+
+        <SectionTitle
           label="Featured Events"
           title="Innovation"
           highlight="in motion."
@@ -554,43 +556,43 @@ const BentoEvents = memo(function BentoEvents() {
               key={event.id}
               ref={el => { cardsRef.current[index] = el; }}
               className={`${event.size} bento-card relative group cursor-pointer`}
-              style={{ 
+              style={{
                 transformStyle: 'preserve-3d',
                 perspective: '1000px'
               }}
             >
               <GlassCard className="h-full overflow-hidden">
-                <motion.div 
+                <motion.div
                   className={`absolute -inset-1 rounded-3xl bg-gradient-to-br ${event.gradient} opacity-0 blur-xl`}
                   whileHover={{ opacity: 0.5 }}
                   transition={{ duration: 0.6 }}
                 />
-                
-                <motion.div 
+
+                <motion.div
                   className="absolute inset-0 rounded-3xl bg-cover bg-center opacity-20"
-                  style={{ 
+                  style={{
                     backgroundImage: `url(${event.image})`,
                     transformStyle: 'preserve-3d',
                     transform: 'translateZ(-50px)'
                   }}
-                  whileHover={{ 
-                    scale: 1.2, 
+                  whileHover={{
+                    scale: 1.2,
                     opacity: 0.4,
                     filter: 'blur(0px)'
                   }}
                   transition={{ duration: 0.8, ease: appleEase }}
                 />
-                
+
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-black via-black/60 to-black/20" />
 
-                <div 
+                <div
                   className="absolute inset-0 p-7 md:p-8 flex flex-col justify-end"
                   style={{ transform: 'translateZ(30px)' }}
                 >
-                  <motion.span 
+                  <motion.span
                     className="text-[#6B8E23] text-[10px] md:text-[11px] tracking-[0.2em] mb-3 font-medium self-start px-3 py-1.5 rounded-full bg-[#6B8E23]/10 backdrop-blur-sm border border-[#6B8E23]/20"
-                    whileHover={{ 
-                      scale: 1.08, 
+                    whileHover={{
+                      scale: 1.08,
                       backgroundColor: 'rgba(107, 142, 35, 0.25)',
                       boxShadow: '0 0 20px rgba(107, 142, 35, 0.3)'
                     }}
@@ -598,17 +600,17 @@ const BentoEvents = memo(function BentoEvents() {
                   >
                     {event.tag}
                   </motion.span>
-                  
-                  <motion.h3 
+
+                  <motion.h3
                     className="text-white text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight leading-tight"
                     whileHover={{ x: 5 }}
                     transition={{ duration: 0.3 }}
                   >
                     {event.title}
                   </motion.h3>
-                  
+
                   {/* PERF: Removed filter: blur animation - use opacity + y only */}
-                  <motion.p 
+                  <motion.p
                     className="text-[#86868B] text-sm mt-3 line-clamp-2 max-w-[90%]"
                     initial={{ opacity: 0, y: 15 }}
                     whileHover={{ opacity: 1, y: 0 }}
@@ -617,20 +619,20 @@ const BentoEvents = memo(function BentoEvents() {
                   >
                     {event.description}
                   </motion.p>
-                  
+
                   <div className="mt-5 flex items-center justify-between">
                     <span className="text-[#86868B] text-[11px] tracking-wider font-medium">{event.date}</span>
-                    <motion.div 
+                    <motion.div
                       className="flex items-center gap-2 text-[#6B8E23] text-xs font-medium"
                       initial={{ opacity: 0, x: -15 }}
                       whileHover={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.4 }}
                     >
                       Learn more
-                      <motion.svg 
-                        className="w-4 h-4" 
-                        fill="none" 
-                        viewBox="0 0 24 24" 
+                      <motion.svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
                         stroke="currentColor"
                         animate={{ x: [0, 5, 0] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
@@ -641,14 +643,14 @@ const BentoEvents = memo(function BentoEvents() {
                   </div>
                 </div>
 
-                <motion.div 
+                <motion.div
                   className="absolute inset-0 rounded-3xl pointer-events-none"
                   initial={{ opacity: 0 }}
                   whileHover={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
                 >
                   <div className="absolute inset-0 rounded-3xl border border-white/20" />
-                  <motion.div 
+                  <motion.div
                     className="absolute inset-0 rounded-3xl"
                     style={{
                       background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
@@ -659,12 +661,12 @@ const BentoEvents = memo(function BentoEvents() {
                   />
                 </motion.div>
 
-                <motion.div 
+                <motion.div
                   className="absolute inset-0 rounded-3xl pointer-events-none overflow-hidden"
                   initial={{ opacity: 0 }}
                   whileHover={{ opacity: 1 }}
                 >
-                  <motion.div 
+                  <motion.div
                     className="absolute -inset-full top-0 bg-gradient-to-r from-transparent via-white/15 to-transparent rotate-12"
                     initial={{ x: '-100%' }}
                     whileHover={{ x: '100%' }}
@@ -676,23 +678,23 @@ const BentoEvents = memo(function BentoEvents() {
           ))}
         </div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1, delay: 0.4, ease: appleEase }}
           className="mt-20 w-full flex justify-center"
         >
-          <MagneticButton 
+          <MagneticButton
             className="group relative px-8 py-4 rounded-full bg-white/[0.05] backdrop-blur-xl border border-white/10 text-white font-medium text-sm tracking-wide hover:bg-white/10 hover:border-white/20 transition-all duration-500"
             strength={0.4}
           >
             <span className="flex items-center gap-3">
               View all events
-              <motion.svg 
-                className="w-4 h-4" 
-                fill="none" 
-                viewBox="0 0 24 24" 
+              <motion.svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
                 whileHover={{ x: 4 }}
                 transition={{ duration: 0.3 }}
@@ -708,12 +710,12 @@ const BentoEvents = memo(function BentoEvents() {
 });
 
 // PERF: Memoized AnimatedCounter with GPU-accelerated animations (no blur)
-const AnimatedCounter = memo(function AnimatedCounter({ 
-  value, 
+const AnimatedCounter = memo(function AnimatedCounter({
+  value,
   suffix = "",
   delay = 0
-}: { 
-  value: number; 
+}: {
+  value: number;
   suffix?: string;
   delay?: number;
 }) {
@@ -724,11 +726,11 @@ const AnimatedCounter = memo(function AnimatedCounter({
 
   useEffect(() => {
     if (!isInView || hasAnimated) return;
-    
+
     setHasAnimated(true);
-    
+
     const counter = { value: 0 };
-    
+
     gsap.to(counter, {
       value: value,
       duration: 2.5,
@@ -743,7 +745,7 @@ const AnimatedCounter = memo(function AnimatedCounter({
   return (
     <div ref={ref} className="relative">
       {/* PERF: Removed filter: blur - use scale + opacity only */}
-      <motion.span 
+      <motion.span
         className="inline-block text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60"
         initial={{ scale: 0.5, opacity: 0 }}
         animate={isInView ? { scale: 1, opacity: 1 } : {}}
@@ -752,7 +754,7 @@ const AnimatedCounter = memo(function AnimatedCounter({
       >
         {displayValue}{suffix}
       </motion.span>
-      <motion.div 
+      <motion.div
         className="absolute inset-0 rounded-full bg-gradient-to-r from-[#6B8E23]/20 to-[#8FBC8F]/20 -z-10"
         style={{ filter: 'blur(48px)', transform: 'translateZ(0)' }}
         initial={{ opacity: 0, scale: 0 }}
@@ -769,31 +771,31 @@ function AboutSection() {
     target: sectionRef,
     offset: ["start end", "end start"]
   });
-  
+
   const backgroundY = useTransform(scrollYProgress, [0, 1], ['-20%', '20%']);
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="w-full bg-black py-40 md:py-52 lg:py-64 px-6 flex flex-col items-center relative overflow-hidden"
     >
-      <motion.div 
+      <motion.div
         style={{ y: backgroundY }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full bg-gradient-to-r from-[#6B8E23]/15 via-[#8FBC8F]/10 to-transparent blur-[150px] pointer-events-none" 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full bg-gradient-to-r from-[#6B8E23]/15 via-[#8FBC8F]/10 to-transparent blur-[150px] pointer-events-none"
       />
-      
-      <motion.div 
-        animate={{ 
+
+      <motion.div
+        animate={{
           scale: [1, 1.2, 1],
           opacity: [0.1, 0.2, 0.1]
         }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full bg-[#8FBC8F]/10 blur-[120px] pointer-events-none" 
+        className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full bg-[#8FBC8F]/10 blur-[120px] pointer-events-none"
       />
-      
+
       <div className="max-w-5xl w-full flex flex-col items-center text-center relative z-10">
-        
+
         <motion.div
           initial={{ opacity: 0, y: 30, scale: 0.9 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -825,15 +827,15 @@ function AboutSection() {
             { value: 2, suffix: "K+", label: "Participants", color: "#8FBC8F" },
             { value: 100, suffix: "%", label: "Innovation", color: "#6B8E23" }
           ].map((stat, i) => (
-            <motion.div 
-              key={i} 
+            <motion.div
+              key={i}
               className="text-center relative group"
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: i * 0.15, ease: appleEase }}
             >
-              <motion.div 
+              <motion.div
                 className="absolute -bottom-4 left-1/2 -translate-x-1/2 h-[2px] rounded-full"
                 style={{ backgroundColor: stat.color }}
                 initial={{ width: 0, opacity: 0 }}
@@ -841,11 +843,11 @@ function AboutSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 1, delay: i * 0.15 + 0.8, ease: appleEase }}
               />
-              
+
               <div className="text-4xl md:text-6xl lg:text-7xl font-semibold">
                 <AnimatedCounter value={stat.value} suffix={stat.suffix} delay={i * 0.2} />
               </div>
-              <motion.div 
+              <motion.div
                 className="text-[#86868B] text-xs md:text-sm mt-4 tracking-wide font-medium"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
@@ -866,16 +868,16 @@ function AboutSection() {
           className="mt-20 md:mt-24"
         >
           <Link href="/about">
-            <MagneticButton 
+            <MagneticButton
               className="group relative px-12 py-5 rounded-full bg-gradient-to-r from-[#6B8E23] to-[#6B8E23] text-white font-semibold text-sm tracking-wide overflow-hidden transition-all duration-500 hover:shadow-[0_0_60px_rgba(10,132,255,0.5)]"
               strength={0.3}
             >
               <span className="relative z-10 flex items-center gap-3">
                 Discover our story
-                <motion.svg 
-                  className="w-4 h-4" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
+                <motion.svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
                   whileHover={{ x: 4 }}
                   transition={{ duration: 0.3 }}
@@ -884,7 +886,7 @@ function AboutSection() {
                 </motion.svg>
               </span>
 
-              <motion.div 
+              <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-[#6B8E23] via-[#8FBC8F] to-[#6B8E23] bg-[length:200%_100%]"
                 initial={{ opacity: 0 }}
                 whileHover={{ opacity: 1 }}
@@ -901,28 +903,56 @@ function AboutSection() {
 
 // PERF: Memoized ContactSection with GPU-accelerated GSAP animations
 const ContactSection = memo(function ContactSection() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMsg(null);
+
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      subject: formData.get("subject") as string,
+      message: formData.get("message") as string,
+    };
+
+    const result = await submitContactForm(data);
+    setIsSubmitting(false);
+
+    if (result.success) {
+      setSuccess(true);
+      e.currentTarget.reset();
+    } else {
+      setErrorMsg(result.error || "An error occurred. Please try again.");
+    }
+  }
+
   const sectionRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const inputsRef = useRef<(HTMLDivElement | null)[]>([]);
-  
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"]
   });
-  
+
   const backgroundY = useTransform(scrollYProgress, [0, 1], ['10%', '-10%']);
 
   useEffect(() => {
     if (!sectionRef.current) return;
-    
+
     const ctx = gsap.context(() => {
       inputsRef.current.forEach((input, index) => {
         if (!input) return;
-        
+
         // PERF: Add force3D for GPU acceleration
-        gsap.fromTo(input, 
-          { 
-            x: index % 2 === 0 ? -60 : 60, 
+        gsap.fromTo(input,
+          {
+            x: index % 2 === 0 ? -60 : 60,
             opacity: 0,
             rotateY: index % 2 === 0 ? -10 : 10
           },
@@ -949,7 +979,7 @@ const ContactSection = memo(function ContactSection() {
   }, []);
 
   const contactInfo = [
-    { 
+    {
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -959,7 +989,7 @@ const ContactSection = memo(function ContactSection() {
       value: "hello@hackathonhub.dev",
       color: "#6B8E23"
     },
-    { 
+    {
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -970,7 +1000,7 @@ const ContactSection = memo(function ContactSection() {
       value: "NSBM Green University",
       color: "#6B8E23"
     },
-    { 
+    {
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -990,30 +1020,30 @@ const ContactSection = memo(function ContactSection() {
   ];
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="w-full bg-black py-32 md:py-44 lg:py-52 px-6 flex flex-col items-center relative overflow-hidden"
       style={{ perspective: '1500px' }}
     >
-      <motion.div 
+      <motion.div
         style={{ y: backgroundY }}
-        className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full bg-gradient-to-l from-[#6B8E23]/10 via-[#8FBC8F]/5 to-transparent blur-[180px] pointer-events-none" 
+        className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full bg-gradient-to-l from-[#6B8E23]/10 via-[#8FBC8F]/5 to-transparent blur-[180px] pointer-events-none"
       />
-      <motion.div 
-        animate={{ 
+      <motion.div
+        animate={{
           scale: [1, 1.3, 1],
           opacity: [0.08, 0.15, 0.08]
         }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full bg-[#6B8E23]/10 blur-[150px] pointer-events-none" 
+        className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full bg-[#6B8E23]/10 blur-[150px] pointer-events-none"
       />
-      
+
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:80px_80px] pointer-events-none opacity-50" />
-      
+
       <div className="max-w-6xl w-full relative z-10">
-        
+
         <div className="text-center mb-20 md:mb-28">
-          <motion.span 
+          <motion.span
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -1022,10 +1052,10 @@ const ContactSection = memo(function ContactSection() {
           >
             Get in Touch
           </motion.span>
-          
+
           <h2 className="text-white text-5xl md:text-7xl lg:text-8xl font-semibold tracking-tight leading-[0.95]">
             <TextReveal delay={0.1}>Let's build</TextReveal>
-            <motion.span 
+            <motion.span
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
@@ -1035,8 +1065,8 @@ const ContactSection = memo(function ContactSection() {
               together.
             </motion.span>
           </h2>
-          
-          <motion.p 
+
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -1056,104 +1086,144 @@ const ContactSection = memo(function ContactSection() {
             transition={{ duration: 1, ease: appleEase }}
           >
             <GlassCard className="p-8 md:p-10">
-              <form ref={formRef} className="space-y-6">
-                <div 
-                  ref={el => { inputsRef.current[0] = el; }}
-                  className="group"
-                >
-                  <label className="text-[#86868B] text-xs uppercase tracking-wider mb-3 block font-medium">
-                    Your Name
-                  </label>
-                  <div className="relative">
-                    <input 
-                      type="text"
-                      placeholder="John Doe"
-                      className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 focus:bg-white/[0.05] transition-all duration-500 text-sm"
-                    />
-                    <motion.div 
-                      className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[#6B8E23] to-[#8FBC8F] rounded-full"
-                      initial={{ width: '0%' }}
-                      whileFocus={{ width: '100%' }}
-                      transition={{ duration: 0.5, ease: appleEase }}
-                    />
+              <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+                {success ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-center h-full min-h-[400px]">
+                    <div className="w-16 h-16 rounded-full bg-[#6B8E23]/10 flex items-center justify-center mb-6 border border-[#6B8E23]/20">
+                      <CheckCircle className="w-8 h-8 text-[#6B8E23]" />
+                    </div>
+                    <h3 className="text-2xl font-semibold text-white mb-2">Message Sent!</h3>
+                    <p className="text-[#86868B] mb-8 max-w-[250px] mx-auto">
+                      Thank you, we'll get back to you soon!
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setSuccess(false)}
+                      className="px-6 py-2 rounded-full border border-white/[0.08] hover:border-[#6B8E23] hover:text-[#8FBC8F] hover:bg-[#6B8E23]/10 text-sm font-medium text-white transition-all duration-300"
+                    >
+                      Send another message
+                    </button>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    {errorMsg && (
+                      <div className="p-3 text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-xl mb-6">
+                        {errorMsg}
+                      </div>
+                    )}
+                    <div
+                      ref={el => { inputsRef.current[0] = el; }}
+                      className="group"
+                    >
+                      <label className="text-[#86868B] text-xs uppercase tracking-wider mb-3 block font-medium">
+                        Your Name
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          name="name"
+                          required
+                          disabled={isSubmitting}
+                          placeholder="John Doe"
+                          className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 focus:bg-white/[0.05] transition-all duration-500 text-sm disabled:opacity-50"
+                        />
+                        <motion.div
+                          className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[#6B8E23] to-[#8FBC8F] rounded-full"
+                          initial={{ width: '0%' }}
+                          whileFocus={{ width: '100%' }}
+                          transition={{ duration: 0.5, ease: appleEase }}
+                        />
+                      </div>
+                    </div>
 
-                <div 
-                  ref={el => { inputsRef.current[1] = el; }}
-                  className="group"
-                >
-                  <label className="text-[#86868B] text-xs uppercase tracking-wider mb-3 block font-medium">
-                    Email Address
-                  </label>
-                  <input 
-                    type="email"
-                    placeholder="john@example.com"
-                    className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 focus:bg-white/[0.05] transition-all duration-500 text-sm"
-                  />
-                </div>
+                    <div
+                      ref={el => { inputsRef.current[1] = el; }}
+                      className="group"
+                    >
+                      <label className="text-[#86868B] text-xs uppercase tracking-wider mb-3 block font-medium">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        required
+                        disabled={isSubmitting}
+                        placeholder="john@example.com"
+                        className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 focus:bg-white/[0.05] transition-all duration-500 text-sm disabled:opacity-50"
+                      />
+                    </div>
 
-                <div 
-                  ref={el => { inputsRef.current[2] = el; }}
-                  className="group"
-                >
-                  <label className="text-[#86868B] text-xs uppercase tracking-wider mb-3 block font-medium">
-                    Subject
-                  </label>
-                  <input 
-                    type="text"
-                    placeholder="What's this about?"
-                    className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 focus:bg-white/[0.05] transition-all duration-500 text-sm"
-                  />
-                </div>
+                    <div
+                      ref={el => { inputsRef.current[2] = el; }}
+                      className="group"
+                    >
+                      <label className="text-[#86868B] text-xs uppercase tracking-wider mb-3 block font-medium">
+                        Subject
+                      </label>
+                      <input
+                        type="text"
+                        name="subject"
+                        required
+                        disabled={isSubmitting}
+                        placeholder="What's this about?"
+                        className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 focus:bg-white/[0.05] transition-all duration-500 text-sm disabled:opacity-50"
+                      />
+                    </div>
 
-                <div 
-                  ref={el => { inputsRef.current[3] = el; }}
-                  className="group"
-                >
-                  <label className="text-[#86868B] text-xs uppercase tracking-wider mb-3 block font-medium">
-                    Message
-                  </label>
-                  <textarea 
-                    rows={5}
-                    placeholder="Tell us about your idea..."
-                    className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 focus:bg-white/[0.05] transition-all duration-500 resize-none text-sm"
-                  />
-                </div>
+                    <div
+                      ref={el => { inputsRef.current[3] = el; }}
+                      className="group"
+                    >
+                      <label className="text-[#86868B] text-xs uppercase tracking-wider mb-3 block font-medium">
+                        Message
+                      </label>
+                      <textarea
+                        rows={5}
+                        name="message"
+                        required
+                        disabled={isSubmitting}
+                        placeholder="Tell us about your idea..."
+                        className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-5 py-4 text-white placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 focus:bg-white/[0.05] transition-all duration-500 resize-none text-sm disabled:opacity-50"
+                      />
+                    </div>
 
-                <div ref={el => { inputsRef.current[4] = el; }}>
-                  <MagneticButton 
-                    className="w-full py-5 rounded-xl bg-gradient-to-r from-[#6B8E23] to-[#8FBC8F] text-white font-semibold text-sm tracking-wide hover:shadow-[0_0_50px_rgba(10,132,255,0.4)] transition-all duration-500 relative overflow-hidden group"
-                    strength={0.2}
-                  >
-                    <span className="relative z-10 flex items-center justify-center gap-3">
-                      Send Message
-                      <motion.svg 
-                        className="w-5 h-5" 
-                        fill="none" 
-                        viewBox="0 0 24 24" 
-                        stroke="currentColor"
-                        animate={{ x: [0, 5, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    <div ref={el => { inputsRef.current[4] = el; }}>
+                      <MagneticButton
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full py-5 rounded-xl bg-gradient-to-r from-[#6B8E23] to-[#8FBC8F] text-white font-semibold text-sm tracking-wide hover:shadow-[0_0_50px_rgba(10,132,255,0.4)] transition-all duration-500 relative overflow-hidden group disabled:opacity-75 disabled:cursor-not-allowed"
+                        strength={0.2}
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </motion.svg>
-                    </span>
-                    
-                    <motion.div 
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
-                      initial={{ x: '-100%' }}
-                      whileHover={{ x: '100%' }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                    />
-                  </MagneticButton>
-                </div>
+                        <span className="relative z-10 flex items-center justify-center gap-3">
+                          {isSubmitting ? "Sending..." : "Send Message"}
+                          <motion.svg
+                            className="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            animate={{ x: [0, 5, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          </motion.svg>
+                        </span>
+
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
+                          initial={{ x: '-100%' }}
+                          whileHover={{ x: '100%' }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                        />
+                      </MagneticButton>
+                    </div>
+                  </>
+                )}
               </form>
             </GlassCard>
           </motion.div>
 
           <div className="flex flex-col justify-between gap-10">
-            
+
             <div className="space-y-5">
               {contactInfo.map((info, index) => (
                 <motion.div
@@ -1167,11 +1237,11 @@ const ContactSection = memo(function ContactSection() {
                   style={{ transformStyle: 'preserve-3d' }}
                 >
                   <GlassCard className="p-6 flex items-center gap-5 hover:border-white/[0.15] transition-all duration-500">
-                    <motion.div 
+                    <motion.div
                       className="w-12 h-12 rounded-xl bg-white/[0.03] flex items-center justify-center border border-white/[0.08]"
                       style={{ color: info.color }}
-                      whileHover={{ 
-                        scale: 1.1, 
+                      whileHover={{
+                        scale: 1.1,
                         backgroundColor: `${info.color}20`,
                         boxShadow: `0 0 30px ${info.color}40`
                       }}
@@ -1183,10 +1253,10 @@ const ContactSection = memo(function ContactSection() {
                       <p className="text-[#86868B] text-xs uppercase tracking-wider mb-1">{info.label}</p>
                       <p className="text-white text-sm font-medium">{info.value}</p>
                     </div>
-                    <motion.svg 
-                      className="w-5 h-5 text-[#86868B] ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
+                    <motion.svg
+                      className="w-5 h-5 text-[#86868B] ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      fill="none"
+                      viewBox="0 0 24 24"
                       stroke="currentColor"
                       animate={{ x: [0, 3, 0] }}
                       transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
@@ -1212,8 +1282,8 @@ const ContactSection = memo(function ContactSection() {
                       key={social.name}
                       href={social.href}
                       className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#86868B] hover:text-white hover:bg-white/[0.08] hover:border-white/[0.15] transition-all duration-300"
-                      whileHover={{ 
-                        y: -5, 
+                      whileHover={{
+                        y: -5,
                         scale: 1.1,
                         boxShadow: '0 10px 30px rgba(107, 142, 35, 0.2)'
                       }}
@@ -1229,7 +1299,7 @@ const ContactSection = memo(function ContactSection() {
                   ))}
                 </div>
 
-                <motion.p 
+                <motion.p
                   className="mt-6 text-[#86868B] text-sm"
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
@@ -1254,9 +1324,9 @@ const ContactSection = memo(function ContactSection() {
                     <p className="text-white text-base font-medium">NSBM Green University</p>
                     <p className="text-[#86868B] text-sm mt-1">Pitipana, Homagama</p>
                   </div>
-                  <motion.div 
+                  <motion.div
                     className="w-16 h-16 rounded-full bg-gradient-to-br from-[#6B8E23]/20 to-[#6B8E23]/20 flex items-center justify-center"
-                    animate={{ 
+                    animate={{
                       scale: [1, 1.1, 1],
                       boxShadow: ['0 0 0 0 rgba(107, 142, 35, 0)', '0 0 0 20px rgba(107, 142, 35, 0.1)', '0 0 0 0 rgba(107, 142, 35, 0)']
                     }}
@@ -1268,7 +1338,7 @@ const ContactSection = memo(function ContactSection() {
                     </svg>
                   </motion.div>
                 </div>
-                
+
                 <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full border border-white/[0.03] pointer-events-none" />
                 <div className="absolute -bottom-5 -right-5 w-32 h-32 rounded-full border border-white/[0.05] pointer-events-none" />
               </GlassCard>
@@ -1284,18 +1354,18 @@ export default function LandingPage() {
   const heroRef = useRef<HTMLDivElement>(null);
   const heroContentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"]
   });
-  
+
   const pageScale = useTransform(scrollYProgress, [0, 0.1], [1, 1]);
   const pageY = useTransform(scrollYProgress, [0, 1], [0, 0]);
-  
+
   useEffect(() => {
     if (!heroRef.current) return;
-    
+
     const ctx = gsap.context(() => {
       // PERF: Add force3D for GPU acceleration
       gsap.to('.hero-orb-1', {
@@ -1312,7 +1382,7 @@ export default function LandingPage() {
         ease: "none",
         force3D: true
       });
-      
+
       gsap.to('.hero-orb-2', {
         scrollTrigger: {
           trigger: heroRef.current,
@@ -1348,53 +1418,53 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="w-full bg-black flex flex-col antialiased selection:bg-[#6B8E23]/30 selection:text-white"
     >
-      <section 
+      <section
         ref={heroRef}
         className="relative w-full min-h-screen bg-black overflow-hidden flex flex-col items-center justify-center py-20"
       >
 
         <div className="absolute inset-0 z-0">
-          <motion.div 
-            animate={{ 
+          <motion.div
+            animate={{
               scale: [1, 1.1, 1],
               opacity: [0.15, 0.25, 0.15]
             }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1400px] rounded-full bg-gradient-radial from-[#6B8E23]/20 via-[#8FBC8F]/8 to-transparent blur-[150px]" 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1400px] rounded-full bg-gradient-radial from-[#6B8E23]/20 via-[#8FBC8F]/8 to-transparent blur-[150px]"
           />
-          
-          <motion.div 
-            animate={{ 
+
+          <motion.div
+            animate={{
               x: [0, 80, 0],
               y: [0, -60, 0],
               scale: [1, 1.15, 1]
             }}
             transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-            className="hero-orb-1 absolute top-1/4 left-1/4 w-[800px] h-[800px] rounded-full bg-[#6B8E23]/15 blur-[180px]" 
+            className="hero-orb-1 absolute top-1/4 left-1/4 w-[800px] h-[800px] rounded-full bg-[#6B8E23]/15 blur-[180px]"
           />
-          <motion.div 
-            animate={{ 
+          <motion.div
+            animate={{
               x: [0, -70, 0],
               y: [0, 70, 0],
               scale: [1, 0.85, 1]
             }}
             transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-            className="hero-orb-2 absolute bottom-1/4 right-1/4 w-[700px] h-[700px] rounded-full bg-[#8FBC8F]/15 blur-[180px]" 
+            className="hero-orb-2 absolute bottom-1/4 right-1/4 w-[700px] h-[700px] rounded-full bg-[#8FBC8F]/15 blur-[180px]"
           />
-          
-          <motion.div 
-            animate={{ 
+
+          <motion.div
+            animate={{
               opacity: [0.08, 0.18, 0.08],
               scale: [1, 1.4, 1]
             }}
             transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#556B2F]/10 blur-[120px]" 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#556B2F]/10 blur-[120px]"
           />
-          
+
           <div className="absolute inset-0 opacity-15 pointer-events-none">
             <LiquidEther
               colors={['#6B8E23', '#8FBC8F', '#000000']}
@@ -1413,18 +1483,18 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)] pointer-events-none" />
 
         <div className="hero-content-wrapper relative z-10 w-full max-w-6xl px-6 flex flex-col items-center text-center" ref={heroContentRef}>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, y: 40, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 1.4, ease: appleEase }}
             className="mb-8"
           >
             <div className="px-6 py-3 rounded-full bg-white/[0.03] backdrop-blur-2xl border border-white/[0.06] flex items-center gap-3 shadow-[0_0_60px_rgba(10,132,255,0.15)]">
-              <motion.span 
+              <motion.span
                 animate={{ scale: [1, 1.3, 1], opacity: [1, 0.6, 1] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                className="w-2.5 h-2.5 rounded-full bg-[#6B8E23] shadow-[0_0_10px_#6B8E23]" 
+                className="w-2.5 h-2.5 rounded-full bg-[#6B8E23] shadow-[0_0_10px_#6B8E23]"
               />
               <span className="text-[11px] uppercase tracking-[0.3em] text-[#86868B] font-medium">
                 NSBM Computing Society
@@ -1433,7 +1503,7 @@ export default function LandingPage() {
           </motion.div>
 
           <div className="overflow-hidden">
-            <motion.h1 
+            <motion.h1
               initial={{ y: '120%', rotateX: -15 }}
               animate={{ y: 0, rotateX: 0 }}
               transition={{ duration: 1.6, delay: 0.3, ease: appleEase }}
@@ -1442,9 +1512,9 @@ export default function LandingPage() {
               Hackathon
             </motion.h1>
           </div>
-          
+
           <div className="overflow-hidden mt-1">
-            <motion.span 
+            <motion.span
               initial={{ y: '120%', rotateX: -15, opacity: 0 }}
               animate={{ y: 0, rotateX: 0, opacity: 1 }}
               transition={{ duration: 1.6, delay: 0.5, ease: appleEase }}
@@ -1455,25 +1525,25 @@ export default function LandingPage() {
           </div>
 
           {/* PERF: Removed filter: blur animation - use opacity + y only */}
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.4, delay: 0.9, ease: appleEase }}
             className="mt-8 max-w-xl text-[#86868B] text-lg md:text-xl font-light leading-relaxed"
             style={{ willChange: 'transform, opacity', transform: 'translateZ(0)' }}
           >
-            Where innovation meets action. Join the most ambitious tech community 
+            Where innovation meets action. Join the most ambitious tech community
             at NSBM Green University.
           </motion.p>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.4, delay: 1.1, ease: appleEase }}
             className="mt-10 flex flex-col sm:flex-row gap-4"
           >
             <Link href="/join">
-              <MagneticButton 
+              <MagneticButton
                 className="group relative px-12 py-5 rounded-full bg-white text-black font-semibold text-sm tracking-wide transition-all duration-700 hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] hover:bg-white"
                 strength={0.4}
                 glowColor="rgba(255, 255, 255, 0.5)"
@@ -1488,9 +1558,9 @@ export default function LandingPage() {
                     →
                   </motion.span>
                 </span>
-                
+
                 <div className="absolute inset-0 rounded-full overflow-hidden">
-                  <motion.div 
+                  <motion.div
                     className="absolute -inset-full top-0 bg-gradient-to-r from-transparent via-black/5 to-transparent skew-x-12"
                     animate={{ x: ['0%', '200%'] }}
                     transition={{ duration: 2, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
@@ -1498,19 +1568,19 @@ export default function LandingPage() {
                 </div>
               </MagneticButton>
             </Link>
-            
+
             <Link href="/events">
-              <MagneticButton 
+              <MagneticButton
                 className="group px-12 py-5 rounded-full bg-white/[0.03] backdrop-blur-2xl border border-white/[0.1] text-white font-semibold text-sm tracking-wide hover:bg-white/[0.08] hover:border-white/[0.25] hover:shadow-[0_0_40px_rgba(10,132,255,0.2)] transition-all duration-700"
                 strength={0.4}
                 glowColor="rgba(107, 142, 35, 0.5)"
               >
                 <span className="flex items-center gap-3">
                   Explore Events
-                  <motion.svg 
-                    className="w-4 h-4" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
+                  <motion.svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
                     stroke="currentColor"
                     animate={{ x: [0, 3, 0] }}
                     transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
@@ -1523,19 +1593,19 @@ export default function LandingPage() {
           </motion.div>
         </div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2, duration: 1.5, ease: appleEase }}
           className="absolute bottom-8 inset-x-0 flex justify-center pointer-events-none"
         >
-          <motion.div 
+          <motion.div
             className="flex flex-col items-center gap-3"
             animate={{ y: [0, 8, 0] }}
             transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
           >
             <div className="w-6 h-10 rounded-full border border-white/20 flex justify-center pt-2">
-              <motion.div 
+              <motion.div
                 className="w-1 h-2 rounded-full bg-white/60"
                 animate={{ y: [0, 12, 0], opacity: [1, 0.3, 1] }}
                 transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
@@ -1544,7 +1614,7 @@ export default function LandingPage() {
           </motion.div>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2.2, duration: 1 }}
@@ -1558,9 +1628,9 @@ export default function LandingPage() {
       <section className="w-full py-20 md:py-24 bg-black overflow-hidden">
         <ScrollVelocity
           texts={[
-            'HACKATHON HUB  •  INNOVATION  •', 
+            'HACKATHON HUB  •  INNOVATION  •',
             'CODE  •  BUILD  •  LAUNCH  •'
-          ]} 
+          ]}
           velocity={35}
           className="text-white/[0.06] font-semibold uppercase tracking-tight text-7xl md:text-9xl"
         />
@@ -1573,16 +1643,16 @@ export default function LandingPage() {
       <ContactSection />
 
       <footer className="w-full bg-black relative overflow-hidden">
-        
+
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-[#6B8E23]/5 via-[#8FBC8F]/3 to-transparent blur-[100px] pointer-events-none" />
-        
+
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
-        
+
         <div className="max-w-7xl mx-auto px-6 py-20 md:py-28">
-          
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-16">
 
-            <motion.div 
+            <motion.div
               className="md:col-span-1"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -1617,13 +1687,13 @@ export default function LandingPage() {
                 ))}
               </div>
             </motion.div>
-            
+
             {[
               { title: 'Explore', links: ['Events', 'Hackathons', 'Workshops', 'Community'] },
               { title: 'Resources', links: ['Documentation', 'Blog', 'Tutorials', 'FAQ'] },
               { title: 'Company', links: ['About', 'Team', 'Careers', 'Contact'] }
             ].map((column, colIndex) => (
-              <motion.div 
+              <motion.div
                 key={column.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -1634,8 +1704,8 @@ export default function LandingPage() {
                 <ul className="space-y-3">
                   {column.links.map((link, linkIndex) => (
                     <li key={link}>
-                      <motion.a 
-                        href="#" 
+                      <motion.a
+                        href="#"
                         className="text-[#86868B] text-sm hover:text-white transition-colors duration-300 flex items-center gap-2 group"
                         whileHover={{ x: 4 }}
                       >
@@ -1648,8 +1718,8 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </div>
-          
-          <motion.div 
+
+          <motion.div
             className="py-10 border-y border-white/[0.04] mb-10"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -1662,12 +1732,12 @@ export default function LandingPage() {
                 <p className="text-[#86868B] text-sm">Get notified about upcoming events and hackathons.</p>
               </div>
               <div className="flex items-center gap-3 w-full md:w-auto">
-                <input 
-                  type="email" 
-                  placeholder="Enter your email" 
+                <input
+                  type="email"
+                  placeholder="Enter your email"
                   className="flex-1 md:w-64 px-5 py-3 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white text-sm placeholder:text-[#86868B]/50 focus:outline-none focus:border-[#6B8E23]/50 transition-all duration-300"
                 />
-                <MagneticButton 
+                <MagneticButton
                   className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#6B8E23] to-[#8FBC8F] text-white text-sm font-medium hover:shadow-[0_0_30px_rgba(10,132,255,0.4)] transition-all duration-300"
                   strength={0.2}
                 >
@@ -1676,9 +1746,9 @@ export default function LandingPage() {
               </div>
             </div>
           </motion.div>
-          
+
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <motion.div 
+            <motion.div
               className="flex flex-col md:flex-row items-center gap-4 md:gap-6"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -1688,9 +1758,9 @@ export default function LandingPage() {
               <span className="text-[#86868B]/50 text-xs">© 2026 Hackathon Hub. All rights reserved.</span>
               <div className="flex items-center gap-5">
                 {['Privacy Policy', 'Terms of Service', 'Cookies'].map((link) => (
-                  <motion.a 
+                  <motion.a
                     key={link}
-                    href="#" 
+                    href="#"
                     className="text-[#86868B]/60 text-xs hover:text-[#86868B] transition-colors duration-300"
                     whileHover={{ y: -1 }}
                   >
@@ -1699,8 +1769,8 @@ export default function LandingPage() {
                 ))}
               </div>
             </motion.div>
-            
-            <motion.p 
+
+            <motion.p
               className="text-[#86868B]/25 text-[10px] tracking-wide"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -1711,9 +1781,9 @@ export default function LandingPage() {
             </motion.p>
           </div>
         </div>
-        
+
         <div className="h-[2px] bg-gradient-to-r from-transparent via-[#6B8E23]/30 to-transparent" />
-        
+
       </footer>
 
     </div>
