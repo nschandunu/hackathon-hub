@@ -1,0 +1,11 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma\schema.prisma.
+Datasource "db": PostgreSQL database "postgres", schema "public" at "db.zpfktjdmnwsyucqubtiv.supabase.co:5432"
+
+ÔÜá´©Å  There might be data loss when applying the changes:
+
+  ÔÇó You are about to drop the column `thumbnailUrl` on the `Event` table, which still contains 2 non-null values.
+
+
+Error: Use the --accept-data-loss flag to ignore the data loss warnings like prisma db push --accept-data-loss
