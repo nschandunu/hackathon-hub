@@ -1,6 +1,9 @@
+export const dynamic = "force-dynamic";
+
 import { prisma } from "@/lib/db";
 import EventForm from "./EventForm";
 import GalleryUploadForm from "./GalleryUploadForm";
+import ThumbnailUploadForm from "./ThumbnailUploadForm";
 import { LogoutButton } from "@/components/logout-button";
 
 export default async function AdminDashboardPage() {
@@ -10,6 +13,11 @@ export default async function AdminDashboardPage() {
     });
 
     const eventOptions = events.map((e) => ({ id: e.id, title: e.title }));
+    const thumbnailEventOptions = events.map((e) => ({
+        id: e.id,
+        title: e.title,
+        thumbnailUrl: e.thumbnailUrl,
+    }));
 
     return (
         <div className="min-h-screen bg-background">
@@ -34,6 +42,11 @@ export default async function AdminDashboardPage() {
 
                     {/* Section B: Update Event Gallery */}
                     <GalleryUploadForm events={eventOptions} />
+                </div>
+
+                {/* Thumbnail Upload Section */}
+                <div className="mb-10">
+                    <ThumbnailUploadForm events={thumbnailEventOptions} />
                 </div>
 
                 {/* Events List */}
