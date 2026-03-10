@@ -25,6 +25,7 @@ model Event {
   date             DateTime
   location         String
   registrationLink String?
+  thumbnailUrl     String?
   status           EventStatus @default(UPCOMING)
   isPublished      Boolean     @default(true)
   createdAt        DateTime    @default(now())

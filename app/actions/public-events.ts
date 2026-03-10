@@ -38,9 +38,11 @@ export async function getAllEvents() {
             isPublished: true,
         },
         include: {
-            media: true,
+            media: {
+                where: { type: "GALLERY" },
+            },
         },
-        orderBy: { date: "desc" },
+        orderBy: { date: "asc" },
     });
 }
 
