@@ -30,47 +30,115 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
   wordAnimationEnd = 'bottom bottom'
 }) => {
   const containerRef = useRef<HTMLHeadingElement>(null);
+  // Store trigger IDs for targeted cleanup (avoid killing unrelated triggers)
+  const triggerIdsRef = useRef<string[]>([]);
 
+  // PERF: Memoize split text with GPU-acceleration hints
+  // Use two-layer approach for blur: blurred layer underneath, clear layer on top
+  // Animate opacity of clear layer (GPU-composited) instead of filter: blur (causes repaints)
   const splitText = useMemo(() => {
     const text = typeof children === 'string' ? children : '';
     return text.split(/(\s+)/).map((word, index) => {
       if (word.match(/^\s+$/)) return word;
+      
+      // PERF: Two-layer blur technique - animate opacity (GPU) instead of blur (CPU)
+      if (enableBlur) {
+        return (
+          <span 
+            className="inline-block word relative" 
+            key={index}
+            // PERF: will-change hints for composite layer promotion
+            style={{ willChange: 'opacity, transform' }}
+          >
+            {/* Background blurred layer (static blur, no animation needed) */}
+            <span 
+              className="word-blur absolute inset-0"
+              style={{ 
+                filter: `blur(${blurStrength}px)`,
+                // PERF: Force GPU layer for the static blurred element
+                transform: 'translateZ(0)',
+                willChange: 'opacity'
+              }}
+              aria-hidden="true"
+            >
+              {word}
+            </span>
+            {/* Foreground clear layer (animate opacity only - GPU accelerated) */}
+            <span 
+              className="word-clear relative"
+              style={{ 
+                // PERF: Force GPU layer
+                transform: 'translateZ(0)',
+                willChange: 'opacity'
+              }}
+            >
+              {word}
+            </span>
+          </span>
+        );
+      }
+      
       return (
-        <span className="inline-block word" key={index}>
+        <span 
+          className="inline-block word" 
+          key={index}
+          style={{ willChange: 'opacity, transform' }}
+        >
           {word}
         </span>
       );
     });
-  }, [children]);
+  }, [children, enableBlur, blurStrength]);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
     const scroller = scrollContainerRef && scrollContainerRef.current ? scrollContainerRef.current : window;
+    const triggers: string[] = [];
 
-    gsap.fromTo(
+    // PERF: Container rotation animation - use transform only (GPU accelerated)
+    const rotationTrigger = gsap.fromTo(
       el,
-      { transformOrigin: '0% 50%', rotate: baseRotation },
+      { 
+        transformOrigin: '0% 50%', 
+        rotate: baseRotation,
+        // PERF: Force GPU acceleration
+        force3D: true
+      },
       {
         ease: 'none',
         rotate: 0,
+        force3D: true,
         scrollTrigger: {
           trigger: el,
           scroller,
           start: 'top bottom',
           end: rotationEnd,
-          scrub: true
+          scrub: true,
+          // PERF: Reduce ScrollTrigger overhead
+          fastScrollEnd: true,
+          preventOverlaps: true
         }
       }
     );
+    if (rotationTrigger.scrollTrigger?.vars.id) {
+      triggers.push(rotationTrigger.scrollTrigger.vars.id);
+    }
 
-    const wordElements = el.querySelectorAll<HTMLElement>('.word');
+    if (enableBlur) {
+      // PERF: Two-layer blur technique
+      // Animate clear layer opacity (from 0 to 1) while blur layer fades out
+      const clearElements = el.querySelectorAll<HTMLElement>('.word-clear');
+      const blurElements = el.querySelectorAll<HTMLElement>('.word-blur');
 
-    gsap.fromTo(
-      wordElements,
-      { opacity: baseOpacity, willChange: 'opacity' },
-      {
+      // Clear layer: start hidden, fade in
+      gsap.set(clearElements, { opacity: 0 });
+      // Blur layer: start visible
+      gsap.set(blurElements, { opacity: 1 });
+
+      // PERF: Animate opacity only (GPU composite operation)
+      const clearTrigger = gsap.to(clearElements, {
         ease: 'none',
         opacity: 1,
         stagger: 0.05,
@@ -79,37 +147,73 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
           scroller,
           start: 'top bottom-=20%',
           end: wordAnimationEnd,
-          scrub: true
+          scrub: true,
+          fastScrollEnd: true
         }
-      }
-    );
+      });
 
-    if (enableBlur) {
-      gsap.fromTo(
-        wordElements,
-        { filter: `blur(${blurStrength}px)` },
-        {
-          ease: 'none',
-          filter: 'blur(0px)',
-          stagger: 0.05,
-          scrollTrigger: {
-            trigger: el,
-            scroller,
-            start: 'top bottom-=20%',
-            end: wordAnimationEnd,
-            scrub: true
-          }
+      // PERF: Fade out blur layer simultaneously (opacity only)
+      const blurTrigger = gsap.to(blurElements, {
+        ease: 'none',
+        opacity: 0,
+        stagger: 0.05,
+        scrollTrigger: {
+          trigger: el,
+          scroller,
+          start: 'top bottom-=20%',
+          end: wordAnimationEnd,
+          scrub: true,
+          fastScrollEnd: true
         }
-      );
+      });
+
+      if (clearTrigger.scrollTrigger?.vars.id) triggers.push(clearTrigger.scrollTrigger.vars.id);
+      if (blurTrigger.scrollTrigger?.vars.id) triggers.push(blurTrigger.scrollTrigger.vars.id);
+
+    } else {
+      // Non-blur mode: simple opacity animation
+      const wordElements = el.querySelectorAll<HTMLElement>('.word');
+
+      gsap.set(wordElements, { opacity: baseOpacity });
+
+      const opacityTrigger = gsap.to(wordElements, {
+        ease: 'none',
+        opacity: 1,
+        stagger: 0.05,
+        scrollTrigger: {
+          trigger: el,
+          scroller,
+          start: 'top bottom-=20%',
+          end: wordAnimationEnd,
+          scrub: true,
+          fastScrollEnd: true
+        }
+      });
+
+      if (opacityTrigger.scrollTrigger?.vars.id) triggers.push(opacityTrigger.scrollTrigger.vars.id);
     }
 
+    triggerIdsRef.current = triggers;
+
+    // PERF: Clean up only our specific triggers, not all ScrollTriggers globally
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+      triggerIdsRef.current.forEach(id => {
+        const trigger = ScrollTrigger.getById(id);
+        if (trigger) trigger.kill();
+      });
+      // Kill all tweens on this element to prevent memory leaks
+      gsap.killTweensOf(el);
+      gsap.killTweensOf(el.querySelectorAll('.word, .word-clear, .word-blur'));
     };
   }, [scrollContainerRef, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength]);
 
   return (
-    <h2 ref={containerRef} className={`my-5 ${containerClassName}`}>
+    <h2 
+      ref={containerRef} 
+      className={`my-5 ${containerClassName}`}
+      // PERF: Force GPU layer for container
+      style={{ transform: 'translateZ(0)', willChange: 'transform' }}
+    >
       <p className={`text-[clamp(1.6rem,4vw,3rem)] leading-[1.5] font-semibold ${textClassName}`}>{splitText}</p>
     </h2>
   );

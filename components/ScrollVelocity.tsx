@@ -1,4 +1,4 @@
-import React, { useRef, useLayoutEffect, useState } from 'react';
+import React, { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import {
   motion,
   useScroll,
@@ -54,8 +54,20 @@ function useElementWidth<T extends HTMLElement>(ref: React.RefObject<T | null>):
       }
     }
     updateWidth();
-    window.addEventListener('resize', updateWidth);
-    return () => window.removeEventListener('resize', updateWidth);
+    // PERF: Use passive event listener and debounce resize
+    let rafId: number | null = null;
+    const handleResize = () => {
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        updateWidth();
+        rafId = null;
+      });
+    };
+    window.addEventListener('resize', handleResize, { passive: true });
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, [ref]);
 
   return width;
@@ -75,6 +87,29 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
   parallaxStyle,
   scrollerStyle
 }) => {
+  // PERF: Track visibility of entire section to pause all text animations
+  const sectionRef = useRef<HTMLElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    // PERF: IntersectionObserver to pause animations when off-screen
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { 
+        threshold: 0,
+        rootMargin: '50px' // Start animating slightly before visible
+      }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
   function VelocityText({
     children,
     baseVelocity = velocity,
@@ -88,7 +123,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
     scrollerClassName,
     parallaxStyle,
     scrollerStyle
-  }: VelocityTextProps) {
+  }: VelocityTextProps & { isVisible: boolean }) {
     const baseX = useMotionValue(0);
     const scrollOptions = scrollContainerRef ? { container: scrollContainerRef } : {};
     const { scrollY } = useScroll(scrollOptions);
@@ -119,7 +154,12 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
     });
 
     const directionFactor = useRef<number>(1);
+    
+    // PERF: Only run animation frame when component is visible
     useAnimationFrame((t, delta) => {
+      // PERF: Skip animation calculations when off-screen
+      if (!isVisible) return;
+      
       let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
 
       if (velocityFactor.get() < 0) {
@@ -135,17 +175,40 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
     const spans = [];
     for (let i = 0; i < numCopies!; i++) {
       spans.push(
-        <span className={`flex-shrink-0 ${className}`} key={i} ref={i === 0 ? copyRef : null}>
+        <span 
+          className={`flex-shrink-0 ${className}`} 
+          key={i} 
+          ref={i === 0 ? copyRef : null}
+          // PERF: GPU acceleration hints for text spans
+          style={{ 
+            transform: 'translateZ(0)',
+            backfaceVisibility: 'hidden'
+          }}
+        >
           {children}
         </span>
       );
     }
 
     return (
-      <div className={`${parallaxClassName} relative overflow-hidden`} style={parallaxStyle}>
+      <div 
+        className={`${parallaxClassName} relative overflow-hidden`} 
+        style={{
+          ...parallaxStyle,
+          // PERF: Contain layout to prevent reflows
+          contain: 'layout style paint'
+        }}
+      >
         <motion.div
           className={`${scrollerClassName} flex whitespace-nowrap text-center font-sans text-4xl font-bold tracking-[-0.02em] drop-shadow md:text-[5rem] md:leading-[5rem]`}
-          style={{ x, ...scrollerStyle }}
+          style={{ 
+            x, 
+            ...scrollerStyle,
+            // PERF: Force GPU compositing for smooth transforms
+            willChange: 'transform',
+            transform: 'translateZ(0)',
+            backfaceVisibility: 'hidden'
+          }}
         >
           {spans}
         </motion.div>
@@ -154,7 +217,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
   }
 
   return (
-    <section>
+    <section ref={sectionRef}>
       {texts.map((text: string, index: number) => (
         <VelocityText
           key={index}
@@ -169,6 +232,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
           scrollerClassName={scrollerClassName}
           parallaxStyle={parallaxStyle}
           scrollerStyle={scrollerStyle}
+          isVisible={isVisible}
         >
           {text}&nbsp;
         </VelocityText>
