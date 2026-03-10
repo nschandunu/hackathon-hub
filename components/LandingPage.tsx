@@ -561,6 +561,7 @@ const BentoEvents = memo(function BentoEvents({ events }: { events: EventWithMed
                   className="absolute inset-0 p-7 md:p-8 flex flex-col justify-end"
                   style={{ transform: 'translateZ(30px)' }}
                 >
+                  {index === 0 && (
                   <motion.span
                     className="text-[#6B8E23] text-[10px] md:text-[11px] tracking-[0.2em] mb-3 font-medium self-start px-3 py-1.5 rounded-full bg-[#6B8E23]/10 backdrop-blur-sm border border-[#6B8E23]/20"
                     whileHover={{
@@ -572,6 +573,7 @@ const BentoEvents = memo(function BentoEvents({ events }: { events: EventWithMed
                   >
                     {event.tag}
                   </motion.span>
+                  )}
 
                   <motion.h3
                     className="text-white text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight leading-tight"
