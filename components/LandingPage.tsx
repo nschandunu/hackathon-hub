@@ -583,7 +583,7 @@ const BentoEvents = memo(function BentoEvents({ events }: { events: EventWithMed
                     {event.title}
                   </motion.h3>
 
-                  <div className="mt-5 flex items-center justify-between">
+                  <div className="mt-2 flex items-center justify-between">
                     <span className="text-[#86868B] text-[11px] tracking-wider font-medium">{event.date}</span>
                     <motion.div
                       className="flex items-center gap-2 text-[#6B8E23] text-xs font-medium"
@@ -648,6 +648,7 @@ const BentoEvents = memo(function BentoEvents({ events }: { events: EventWithMed
           transition={{ duration: 1, delay: 0.4, ease: appleEase }}
           className="mt-20 w-full flex justify-center"
         >
+          <Link href="/events">
           <MagneticButton
             className="group relative px-8 py-4 rounded-full bg-white/[0.05] backdrop-blur-xl border border-white/10 text-white font-medium text-sm tracking-wide hover:bg-white/10 hover:border-white/20 transition-all duration-500"
             strength={0.4}
@@ -666,6 +667,7 @@ const BentoEvents = memo(function BentoEvents({ events }: { events: EventWithMed
               </motion.svg>
             </span>
           </MagneticButton>
+          </Link>
         </motion.div>
       </div>
     </section>
