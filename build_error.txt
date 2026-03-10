@@ -1,0 +1,23 @@
+
+> build
+> next build
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local, .env
+
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 16.8s
+  Running TypeScript ...
+Failed to compile.
+
+./app/actions/contact-actions.ts:6:10
+Type error: Module '"@/lib/generated/prisma/client"' has no exported member 'ContactCategory'.
+
+  4 | import { revalidatePath } from 'next/cache';
+  5 | // Import Enum from generated prisma client to ensure type safety
+> 6 | import { ContactCategory } from '@/lib/generated/prisma/client';
+    |          ^
+  7 |
+  8 | export async function submitContactForm(formData: FormData) {
+  9 |   try {
+Next.js build worker exited with code: 1 and signal: null
