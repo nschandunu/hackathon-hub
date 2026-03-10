@@ -516,7 +516,7 @@ function AboutContentSection({ events = [] }: { events?: EventWithMedia[] }) {
                   <motion.div
                     className="absolute inset-0 bg-cover bg-center opacity-100"
                     style={{
-                      backgroundImage: `url(${images[0]})`,
+                      backgroundImage: `url('${images[0]}')`,
                       transformStyle: 'preserve-3d',
                       transform: 'translateZ(-50px)'
                     }}
@@ -620,7 +620,7 @@ function AboutContentSection({ events = [] }: { events?: EventWithMedia[] }) {
                     <motion.div
                       className="absolute inset-0 bg-cover bg-center opacity-100"
                       style={{
-                        backgroundImage: `url(${images[index + 1]})`,
+                        backgroundImage: `url('${images[index + 1]}')`,
                         transformStyle: 'preserve-3d',
                         transform: 'translateZ(-50px)'
                       }}
@@ -657,14 +657,14 @@ function AboutContentSection({ events = [] }: { events?: EventWithMedia[] }) {
         <div className="mt-20 md:mt-32">
           <div
             ref={el => { imageRefs.current[3] = el; }}
-            className="relative w-full min-h-[400px] sm:min-h-[450px] md:min-h-[500px] lg:min-h-[550px] rounded-3xl overflow-hidden group cursor-pointer"
+            className="relative w-full h-[400px] sm:h-[450px] md:h-[500px] lg:h-[550px] rounded-3xl overflow-hidden group cursor-pointer"
             style={{ transformStyle: 'preserve-3d', perspective: '1000px' }}
           >
             <GlassCard className="h-full">
               <motion.div
                 className="absolute inset-0 bg-cover bg-center opacity-100"
                 style={{
-                  backgroundImage: `url(${images[3]})`,
+                  backgroundImage: `url('${images[3]}')`,
                   transformStyle: 'preserve-3d',
                   transform: 'translateZ(-50px)'
                 }}
