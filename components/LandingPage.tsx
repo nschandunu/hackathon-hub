@@ -1517,7 +1517,7 @@ export default function LandingPage({ events }: { events: EventWithMedia[] }) {
             transition={{ duration: 1.4, delay: 1.1, ease: appleEase }}
             className="mt-10 flex flex-col sm:flex-row gap-4"
           >
-            <Link href="/auth/sign-up">
+            <Link href="https://whatsapp.com/channel/0029Vb2kqVT65yD5eA31FO2i">
               <MagneticButton 
                 className="group relative px-12 py-5 rounded-full bg-white text-black font-semibold text-sm tracking-wide transition-all duration-700 hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] hover:bg-white"
                 strength={0.4}
