@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue, useInView, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { EventWithMedia } from '@/app/actions/public-events';
@@ -1174,6 +1175,7 @@ function CTASection() {
           transition={{ duration: 1, delay: 0.9, ease: appleEase }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
+          <a href="https://whatsapp.com/channel/0029Vb2kqVT65yD5eA31FO2i" target="_blank" rel="noopener noreferrer">
           <MagneticButton
             className="group px-8 py-4 rounded-full bg-[#6B8E23] text-white font-medium text-sm tracking-wide hover:bg-[#6B8E23]/90 transition-all duration-500"
             strength={0.4}
@@ -1193,7 +1195,9 @@ function CTASection() {
               </motion.svg>
             </span>
           </MagneticButton>
+          </a>
 
+          <Link href="/events">
           <MagneticButton
             className="group px-8 py-4 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 text-white font-medium text-sm tracking-wide hover:bg-white/10 hover:border-white/20 transition-all duration-500"
             strength={0.4}
@@ -1210,6 +1214,7 @@ function CTASection() {
               </motion.svg>
             </span>
           </MagneticButton>
+          </Link>
         </motion.div>
       </div>
     </section>
@@ -1229,7 +1234,7 @@ function Footer() {
             viewport={{ once: true }}
             className="text-[#86868B] text-sm"
           >
-            © 2026 Computing Society. All rights reserved.
+            © 2026 Hackathon Hub. All rights reserved.
           </motion.div>
 
           <motion.div
