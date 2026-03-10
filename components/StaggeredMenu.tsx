@@ -92,13 +92,16 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       preLayerElsRef.current = preLayers;
 
       const offscreen = position === 'left' ? -100 : 100;
-      gsap.set([panel, ...preLayers], { xPercent: offscreen });
+      // PERF: Use xPercent (transform) which is GPU-accelerated
+      gsap.set([panel, ...preLayers], { xPercent: offscreen, force3D: true });
 
-      gsap.set(plusH, { transformOrigin: '50% 50%', rotate: 0 });
-      gsap.set(plusV, { transformOrigin: '50% 50%', rotate: 90 });
-      gsap.set(icon, { rotate: 0, transformOrigin: '50% 50%' });
+      // PERF: Force GPU layer for icon animations
+      gsap.set(plusH, { transformOrigin: '50% 50%', rotate: 0, force3D: true });
+      gsap.set(plusV, { transformOrigin: '50% 50%', rotate: 90, force3D: true });
+      gsap.set(icon, { rotate: 0, transformOrigin: '50% 50%', force3D: true });
 
-      gsap.set(textInner, { yPercent: 0 });
+      // PERF: Use yPercent instead of manipulating translateY (GPU accelerated)
+      gsap.set(textInner, { yPercent: 0, force3D: true });
 
       if (toggleBtnRef.current) gsap.set(toggleBtnRef.current, { color: menuButtonColor });
     });
@@ -127,15 +130,17 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     const layerStates = layers.map(el => ({ el, start: Number(gsap.getProperty(el, 'xPercent')) }));
     const panelStart = Number(gsap.getProperty(panel, 'xPercent'));
 
-    if (itemEls.length) gsap.set(itemEls, { yPercent: 140, rotate: 10 });
+    // PERF: Use transform properties only (GPU accelerated)
+    if (itemEls.length) gsap.set(itemEls, { yPercent: 140, rotate: 10, force3D: true });
     if (numberEls.length) gsap.set(numberEls, { ['--sm-num-opacity' as any]: 0 });
     if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
-    if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0 });
+    if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0, force3D: true });
 
     const tl = gsap.timeline({ paused: true });
 
+    // PERF: Add force3D to all transform animations
     layerStates.forEach((ls, i) => {
-      tl.fromTo(ls.el, { xPercent: ls.start }, { xPercent: 0, duration: 0.5, ease: 'power4.out' }, i * 0.07);
+      tl.fromTo(ls.el, { xPercent: ls.start }, { xPercent: 0, duration: 0.5, ease: 'power4.out', force3D: true }, i * 0.07);
     });
 
     const lastTime = layerStates.length ? (layerStates.length - 1) * 0.07 : 0;
@@ -145,7 +150,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     tl.fromTo(
       panel,
       { xPercent: panelStart },
-      { xPercent: 0, duration: panelDuration, ease: 'power4.out' },
+      { xPercent: 0, duration: panelDuration, ease: 'power4.out', force3D: true },
       panelInsertTime
     );
 
@@ -153,9 +158,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       const itemsStartRatio = 0.15;
       const itemsStart = panelInsertTime + panelDuration * itemsStartRatio;
 
+      // PERF: Force GPU acceleration for item animations
       tl.to(
         itemEls,
-        { yPercent: 0, rotate: 0, duration: 1, ease: 'power4.out', stagger: { each: 0.1, from: 'start' } },
+        { yPercent: 0, rotate: 0, duration: 1, ease: 'power4.out', stagger: { each: 0.1, from: 'start' }, force3D: true },
         itemsStart
       );
 
@@ -181,6 +187,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
             duration: 0.55,
             ease: 'power3.out',
             stagger: { each: 0.08, from: 'start' },
+            force3D: true,
             onComplete: () => {
               gsap.set(socialLinks, { clearProps: 'opacity' });
             }
@@ -222,14 +229,16 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
     const offscreen = position === 'left' ? -100 : 100;
 
+    // PERF: Force GPU acceleration on close animation
     closeTweenRef.current = gsap.to(all, {
       xPercent: offscreen,
       duration: 0.32,
       ease: 'power3.in',
       overwrite: 'auto',
+      force3D: true,
       onComplete: () => {
         const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel')) as HTMLElement[];
-        if (itemEls.length) gsap.set(itemEls, { yPercent: 140, rotate: 10 });
+        if (itemEls.length) gsap.set(itemEls, { yPercent: 140, rotate: 10, force3D: true });
 
         const numberEls = Array.from(
           panel.querySelectorAll('.sm-panel-list[data-numbering] .sm-panel-item')
@@ -239,7 +248,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         const socialTitle = panel.querySelector('.sm-socials-title') as HTMLElement | null;
         const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link')) as HTMLElement[];
         if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
-        if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0 });
+        if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0, force3D: true });
 
         busyRef.current = false;
       }
@@ -255,18 +264,18 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     spinTweenRef.current?.kill();
 
     if (opening) {
-      // ensure container never rotates
-      gsap.set(icon, { rotate: 0, transformOrigin: '50% 50%' });
+      // PERF: Force GPU layer for icon rotation
+      gsap.set(icon, { rotate: 0, transformOrigin: '50% 50%', force3D: true });
       spinTweenRef.current = gsap
         .timeline({ defaults: { ease: 'power4.out' } })
-        .to(h, { rotate: 45, duration: 0.5 }, 0)
-        .to(v, { rotate: -45, duration: 0.5 }, 0);
+        .to(h, { rotate: 45, duration: 0.5, force3D: true }, 0)
+        .to(v, { rotate: -45, duration: 0.5, force3D: true }, 0);
     } else {
       spinTweenRef.current = gsap
         .timeline({ defaults: { ease: 'power3.inOut' } })
-        .to(h, { rotate: 0, duration: 0.35 }, 0)
-        .to(v, { rotate: 90, duration: 0.35 }, 0)
-        .to(icon, { rotate: 0, duration: 0.001 }, 0);
+        .to(h, { rotate: 0, duration: 0.35, force3D: true }, 0)
+        .to(v, { rotate: 90, duration: 0.35, force3D: true }, 0)
+        .to(icon, { rotate: 0, duration: 0.001, force3D: true }, 0);
     }
   }, []);
 
@@ -316,15 +325,17 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     seq.push(targetLabel);
 
     setTextLines(seq);
-    gsap.set(inner, { yPercent: 0 });
+    gsap.set(inner, { yPercent: 0, force3D: true });
 
     const lineCount = seq.length;
     const finalShift = ((lineCount - 1) / lineCount) * 100;
 
+    // PERF: Use yPercent (GPU accelerated transform) instead of y
     textCycleAnimRef.current = gsap.to(inner, {
       yPercent: -finalShift,
       duration: 0.5 + lineCount * 0.07,
-      ease: 'power4.out'
+      ease: 'power4.out',
+      force3D: true
     });
   }, []);
 
@@ -535,6 +546,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       </div>
 
       <style>{`
+/* PERF: GPU acceleration hints for all animated elements */
 .sm-scope .staggered-menu-wrapper { position: relative; width: 100%; height: 100%; z-index: 40; pointer-events: none; }
 .sm-scope .staggered-menu-header { position: absolute; top: 0; left: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 2em; background: transparent; pointer-events: none; z-index: 20; }
 .sm-scope .staggered-menu-header > * { pointer-events: auto; }
@@ -544,17 +556,23 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 .sm-scope .sm-toggle:focus-visible { outline: 2px solid #ffffffaa; outline-offset: 4px; border-radius: 4px; }
 .sm-scope .sm-line:last-of-type { margin-top: 6px; }
 .sm-scope .sm-toggle-textWrap { position: relative; margin-right: 0.5em; display: inline-block; height: 1em; overflow: hidden; white-space: nowrap; width: var(--sm-toggle-width, auto); min-width: var(--sm-toggle-width, auto); }
-.sm-scope .sm-toggle-textInner { display: flex; flex-direction: column; line-height: 1; }
+/* PERF: Force GPU layer for text scroll animation */
+.sm-scope .sm-toggle-textInner { display: flex; flex-direction: column; line-height: 1; transform: translateZ(0); will-change: transform; backface-visibility: hidden; }
 .sm-scope .sm-toggle-line { display: block; height: 1em; line-height: 1; }
-.sm-scope .sm-icon { position: relative; width: 14px; height: 14px; flex: 0 0 14px; display: inline-flex; align-items: center; justify-content: center; will-change: transform; }
+/* PERF: GPU hints for icon */
+.sm-scope .sm-icon { position: relative; width: 14px; height: 14px; flex: 0 0 14px; display: inline-flex; align-items: center; justify-content: center; will-change: transform; transform: translateZ(0); }
 .sm-scope .sm-panel-itemWrap { position: relative; overflow: hidden; line-height: 1; }
-.sm-scope .sm-icon-line { position: absolute; left: 50%; top: 50%; width: 100%; height: 2px; background: currentColor; border-radius: 2px; transform: translate(-50%, -50%); will-change: transform; }
+/* PERF: GPU hints for icon lines */
+.sm-scope .sm-icon-line { position: absolute; left: 50%; top: 50%; width: 100%; height: 2px; background: currentColor; border-radius: 2px; transform: translate(-50%, -50%) translateZ(0); will-change: transform; backface-visibility: hidden; }
 .sm-scope .sm-line { display: none !important; }
-.sm-scope .staggered-menu-panel { position: absolute; top: 0; right: 0; width: clamp(260px, 38vw, 420px); height: 100%; background: white; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; flex-direction: column; padding: 6em 2em 2em 2em; overflow-y: auto; z-index: 10; }
+/* PERF: GPU acceleration for panel slide */
+.sm-scope .staggered-menu-panel { position: absolute; top: 0; right: 0; width: clamp(260px, 38vw, 420px); height: 100%; background: white; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; flex-direction: column; padding: 6em 2em 2em 2em; overflow-y: auto; z-index: 10; transform: translateZ(0); will-change: transform; backface-visibility: hidden; }
 .sm-scope [data-position='left'] .staggered-menu-panel { right: auto; left: 0; }
+/* PERF: GPU acceleration for prelayers */
 .sm-scope .sm-prelayers { position: absolute; top: 0; right: 0; bottom: 0; width: clamp(260px, 38vw, 420px); pointer-events: none; z-index: 5; }
 .sm-scope [data-position='left'] .sm-prelayers { right: auto; left: 0; }
-.sm-scope .sm-prelayer { position: absolute; top: 0; right: 0; height: 100%; width: 100%; transform: translateX(0); }
+/* PERF: GPU layer for each prelayer */
+.sm-scope .sm-prelayer { position: absolute; top: 0; right: 0; height: 100%; width: 100%; transform: translateZ(0); will-change: transform; backface-visibility: hidden; }
 .sm-scope .sm-panel-inner { flex: 1; display: flex; flex-direction: column; gap: 1.25rem; }
 .sm-scope .sm-socials { margin-top: auto; padding-top: 2rem; display: flex; flex-direction: column; gap: 0.75rem; }
 .sm-scope .sm-socials-title { margin: 0; font-size: 1rem; font-weight: 500; color: var(--sm-accent, #ff0000); }
@@ -565,12 +583,14 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 .sm-scope .sm-socials-list .sm-socials-link:hover,
 .sm-scope .sm-socials-list .sm-socials-link:focus-visible { opacity: 1; }
 .sm-scope .sm-socials-link:focus-visible { outline: 2px solid var(--sm-accent, #ff0000); outline-offset: 3px; }
-.sm-scope .sm-socials-link { font-size: 1.2rem; font-weight: 500; color: #111; text-decoration: none; position: relative; padding: 2px 0; display: inline-block; transition: color 0.3s ease, opacity 0.3s ease; }
+/* PERF: GPU hints for social links animation */
+.sm-scope .sm-socials-link { font-size: 1.2rem; font-weight: 500; color: #111; text-decoration: none; position: relative; padding: 2px 0; display: inline-block; transition: color 0.3s ease, opacity 0.3s ease; transform: translateZ(0); will-change: transform, opacity; }
 .sm-scope .sm-socials-link:hover { color: var(--sm-accent, #ff0000); }
 .sm-scope .sm-panel-title { margin: 0; font-size: 1rem; font-weight: 600; color: #fff; text-transform: uppercase; }
 .sm-scope .sm-panel-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 .sm-scope .sm-panel-item { position: relative; color: #000; font-weight: 600; font-size: 4rem; cursor: pointer; line-height: 1; letter-spacing: -2px; text-transform: uppercase; transition: background 0.25s, color 0.25s; display: inline-block; text-decoration: none; padding-right: 1.4em; }
-.sm-scope .sm-panel-itemLabel { display: inline-block; will-change: transform; transform-origin: 50% 100%; }
+/* PERF: GPU layer for menu item labels */
+.sm-scope .sm-panel-itemLabel { display: inline-block; will-change: transform; transform-origin: 50% 100%; transform: translateZ(0); backface-visibility: hidden; }
 .sm-scope .sm-panel-item:hover { color: var(--sm-accent, #ff0000); }
 .sm-scope .sm-panel-list[data-numbering] { counter-reset: smItem; }
 .sm-scope .sm-panel-list[data-numbering] .sm-panel-item::after { counter-increment: smItem; content: counter(smItem, decimal-leading-zero); position: absolute; top: 0.1em; right: 3.2em; font-size: 18px; font-weight: 400; color: var(--sm-accent, #ff0000); letter-spacing: 0; pointer-events: none; user-select: none; opacity: var(--sm-num-opacity, 0); }

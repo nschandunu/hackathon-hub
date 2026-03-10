@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, memo, useCallback, useMemo } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue, useInView, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import gsap from 'gsap';
@@ -16,7 +16,8 @@ if (typeof window !== 'undefined') {
 const appleEase: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 const appleBounce: [number, number, number, number] = [0.34, 1.56, 0.64, 1];
 
-function MagneticButton({ 
+// PERF: Memoize MagneticButton to prevent unnecessary re-renders
+const MagneticButton = memo(function MagneticButton({ 
   children, 
   className = "",
   strength = 0.3,
@@ -32,22 +33,35 @@ function MagneticButton({
   const y = useMotionValue(0);
   const [isHovered, setIsHovered] = useState(false);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const distX = (e.clientX - centerX) * strength;
-    const distY = (e.clientY - centerY) * strength;
-    x.set(distX);
-    y.set(distY);
-  };
+  // PERF: Throttle mouse move with RAF
+  const rafRef = useRef<number | null>(null);
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!ref.current || rafRef.current) return;
+    rafRef.current = requestAnimationFrame(() => {
+      if (!ref.current) {
+        rafRef.current = null;
+        return;
+      }
+      const rect = ref.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const distX = (e.clientX - centerX) * strength;
+      const distY = (e.clientY - centerY) * strength;
+      x.set(distX);
+      y.set(distY);
+      rafRef.current = null;
+    });
+  }, [strength, x, y]);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     x.set(0);
     y.set(0);
     setIsHovered(false);
-  };
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+  }, [x, y]);
 
   const springConfig = { stiffness: 150, damping: 15 };
   const springX = useSpring(x, springConfig);
@@ -59,37 +73,46 @@ function MagneticButton({
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
-      style={{ x: springX, y: springY }}
+      style={{ 
+        x: springX, 
+        y: springY,
+        // PERF: GPU acceleration hints
+        willChange: 'transform',
+        transform: 'translateZ(0)'
+      }}
       whileTap={{ scale: 0.96 }}
       className={`${className} relative overflow-hidden`}
     >
+      {/* PERF: Simplify glow animation to opacity only (no rotate keyframes) */}
       <motion.div 
-        className="absolute -inset-[1px] rounded-full opacity-0 blur-sm"
-        style={{ background: `linear-gradient(90deg, ${glowColor}, transparent, ${glowColor})` }}
-        animate={{ 
-          opacity: isHovered ? 0.8 : 0,
-          rotate: isHovered ? 360 : 0 
+        className="absolute -inset-[1px] rounded-full opacity-0"
+        style={{ 
+          background: `linear-gradient(90deg, ${glowColor}, transparent, ${glowColor})`,
+          filter: 'blur(4px)',
+          transform: 'translateZ(0)'
         }}
-        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        animate={{ opacity: isHovered ? 0.8 : 0 }}
+        transition={{ duration: 0.3 }}
       />
       
+      {/* PERF: Static radial gradient, animate opacity only */}
       <motion.div 
         className="absolute inset-0 rounded-full"
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ 
-          scale: isHovered ? 1.5 : 0, 
-          opacity: isHovered ? 0 : 0.3 
+        style={{ 
+          background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
+          transform: 'translateZ(0) scale(1.5)'
         }}
-        transition={{ duration: 0.6, ease: appleEase }}
-        style={{ background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)` }}
+        animate={{ opacity: isHovered ? 0.3 : 0 }}
+        transition={{ duration: 0.4, ease: appleEase }}
       />
       
       {children}
     </motion.button>
   );
-}
+});
 
-function TextReveal({ 
+// PERF: Memoize TextReveal and use GPU-accelerated transforms
+const TextReveal = memo(function TextReveal({ 
   children, 
   className = "",
   delay = 0,
@@ -102,7 +125,7 @@ function TextReveal({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const words = children.split(' ');
+  const words = useMemo(() => children.split(' '), [children]);
 
   return (
     <div ref={ref} className={className}>
@@ -117,6 +140,8 @@ function TextReveal({
               delay: delay + i * staggerDelay,
               ease: appleEase
             }}
+            // PERF: GPU acceleration
+            style={{ willChange: 'transform, opacity', transform: 'translateZ(0)' }}
           >
             {word}
           </motion.span>
@@ -124,9 +149,11 @@ function TextReveal({
       ))}
     </div>
   );
-}
+});
 
-function CharacterReveal({ 
+// PERF: Optimize CharacterReveal - remove filter: blur animation (CPU intensive)
+// Use opacity-only fade instead for similar visual effect
+const CharacterReveal = memo(function CharacterReveal({ 
   children, 
   className = "",
   delay = 0 
@@ -137,7 +164,7 @@ function CharacterReveal({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
-  const characters = children.split('');
+  const characters = useMemo(() => children.split(''), [children]);
 
   return (
     <div ref={ref} className={`${className} inline-flex flex-wrap`}>
@@ -145,30 +172,25 @@ function CharacterReveal({
         <motion.span
           key={i}
           className="inline-block"
-          initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
-          animate={isInView ? { 
-            opacity: 1, 
-            y: 0, 
-            filter: 'blur(0px)' 
-          } : { 
-            opacity: 0, 
-            y: 40, 
-            filter: 'blur(10px)' 
-          }}
+          // PERF: Remove filter: blur animation - use opacity + y only (GPU accelerated)
+          initial={{ opacity: 0, y: 40 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
           transition={{
             duration: 0.6,
             delay: delay + i * 0.02,
             ease: appleEase
           }}
+          style={{ willChange: 'transform, opacity', transform: 'translateZ(0)' }}
         >
           {char === ' ' ? '\u00A0' : char}
         </motion.span>
       ))}
     </div>
   );
-}
+});
 
-function ParallaxSection({ 
+// PERF: Memoize ParallaxSection
+const ParallaxSection = memo(function ParallaxSection({ 
   children, 
   className = "",
   speed = 0.5 
@@ -187,13 +209,23 @@ function ParallaxSection({
   const smoothY = useSpring(y, { stiffness: 100, damping: 30 });
 
   return (
-    <motion.div ref={ref} style={{ y: smoothY }} className={className}>
+    <motion.div 
+      ref={ref} 
+      style={{ 
+        y: smoothY,
+        // PERF: GPU acceleration
+        willChange: 'transform',
+        transform: 'translateZ(0)'
+      }} 
+      className={className}
+    >
       {children}
     </motion.div>
   );
-}
+});
 
-function StaggerContainer({ 
+// PERF: Memoize StaggerContainer
+const StaggerContainer = memo(function StaggerContainer({ 
   children, 
   className = "",
   staggerDelay = 0.1 
@@ -222,7 +254,7 @@ function StaggerContainer({
       {children}
     </motion.div>
   );
-}
+});
 
 const fadeUpVariant = {
   hidden: { opacity: 0, y: 60 },
@@ -304,18 +336,17 @@ const containerVariants = {
   },
 };
 
+// PERF: Removed filter: blur animation - uses opacity + transform only (GPU accelerated)
 const cardVariants = {
   hidden: { 
     opacity: 0, 
     y: 80,
-    scale: 0.92,
-    filter: 'blur(10px)'
+    scale: 0.92
   },
   visible: { 
     opacity: 1, 
     y: 0, 
     scale: 1,
-    filter: 'blur(0px)',
     transition: { 
       duration: 1,
       ease: appleEase
@@ -382,24 +413,30 @@ function SectionTitle({
   );
 }
 
-function BentoEvents() {
+// PERF: Memoized BentoEvents with optimized GSAP and mouse handlers
+const BentoEvents = memo(function BentoEvents() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  // PERF: RAF throttling for mouse handlers
+  const rafRefs = useRef<Map<number, number | null>>(new Map());
 
   useEffect(() => {
     if (!sectionRef.current) return;
     
     const ctx = gsap.context(() => {
+      // PERF: Add force3D for GPU acceleration
       gsap.fromTo(sectionRef.current, 
         { scale: 0.9, opacity: 0.5 },
         {
           scale: 1,
           opacity: 1,
+          force3D: true,
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top 80%",
             end: "top 20%",
             scrub: 1,
+            fastScrollEnd: true,
           },
           ease: "power2.out"
         }
@@ -408,6 +445,7 @@ function BentoEvents() {
       cardsRef.current.forEach((card, index) => {
         if (!card) return;
         
+        // PERF: Add force3D for GPU acceleration
         gsap.fromTo(card, 
           { 
             y: 100, 
@@ -423,41 +461,59 @@ function BentoEvents() {
             duration: 1.2,
             delay: index * 0.1,
             ease: "power3.out",
+            force3D: true,
             scrollTrigger: {
               trigger: card,
               start: "top 85%",
-              toggleActions: "play none none reverse"
+              toggleActions: "play none none reverse",
+              fastScrollEnd: true,
             }
           }
         );
 
+        // PERF: Throttle mouse move with RAF
         const handleMouseMove = (e: MouseEvent) => {
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-          
-          const rotateX = (y - centerY) / 20;
-          const rotateY = (centerX - x) / 20;
-          
-          gsap.to(card, {
-            rotateX: rotateX,
-            rotateY: rotateY,
-            scale: 1.02,
-            duration: 0.5,
-            ease: "power2.out",
-            transformPerspective: 1000
-          });
+          if (rafRefs.current.get(index)) return;
+          rafRefs.current.set(index, requestAnimationFrame(() => {
+            if (!card) {
+              rafRefs.current.set(index, null);
+              return;
+            }
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
+            
+            gsap.to(card, {
+              rotateX: rotateX,
+              rotateY: rotateY,
+              scale: 1.02,
+              duration: 0.5,
+              ease: "power2.out",
+              transformPerspective: 1000,
+              force3D: true
+            });
+            rafRefs.current.set(index, null);
+          }));
         };
 
         const handleMouseLeave = () => {
+          const rafId = rafRefs.current.get(index);
+          if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafRefs.current.set(index, null);
+          }
           gsap.to(card, {
             rotateX: 0,
             rotateY: 0,
             scale: 1,
             duration: 0.7,
-            ease: "elastic.out(1, 0.5)"
+            ease: "elastic.out(1, 0.5)",
+            force3D: true
           });
         };
 
@@ -543,11 +599,13 @@ function BentoEvents() {
                     {event.title}
                   </motion.h3>
                   
+                  {/* PERF: Removed filter: blur animation - use opacity + y only */}
                   <motion.p 
                     className="text-[#86868B] text-sm mt-3 line-clamp-2 max-w-[90%]"
-                    initial={{ opacity: 0, y: 15, filter: 'blur(5px)' }}
-                    whileHover={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileHover={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, ease: appleEase }}
+                    style={{ willChange: 'transform, opacity', transform: 'translateZ(0)' }}
                   >
                     {event.description}
                   </motion.p>
@@ -639,9 +697,10 @@ function BentoEvents() {
       </div>
     </section>
   );
-}
+});
 
-function AnimatedCounter({ 
+// PERF: Memoized AnimatedCounter with GPU-accelerated animations (no blur)
+const AnimatedCounter = memo(function AnimatedCounter({ 
   value, 
   suffix = "",
   delay = 0
@@ -675,23 +734,26 @@ function AnimatedCounter({
 
   return (
     <div ref={ref} className="relative">
+      {/* PERF: Removed filter: blur - use scale + opacity only */}
       <motion.span 
         className="inline-block text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60"
-        initial={{ scale: 0.5, opacity: 0, filter: 'blur(10px)' }}
-        animate={isInView ? { scale: 1, opacity: 1, filter: 'blur(0px)' } : {}}
+        initial={{ scale: 0.5, opacity: 0 }}
+        animate={isInView ? { scale: 1, opacity: 1 } : {}}
         transition={{ duration: 0.8, delay: delay, ease: appleEase }}
+        style={{ willChange: 'transform, opacity', transform: 'translateZ(0)' }}
       >
         {displayValue}{suffix}
       </motion.span>
       <motion.div 
-        className="absolute inset-0 rounded-full bg-gradient-to-r from-[#6B8E23]/20 to-[#8FBC8F]/20 blur-3xl -z-10"
+        className="absolute inset-0 rounded-full bg-gradient-to-r from-[#6B8E23]/20 to-[#8FBC8F]/20 -z-10"
+        style={{ filter: 'blur(48px)', transform: 'translateZ(0)' }}
         initial={{ opacity: 0, scale: 0 }}
         animate={isInView ? { opacity: 0.6, scale: 1.5 } : {}}
         transition={{ duration: 1.5, delay: delay + 0.5, ease: appleEase }}
       />
     </div>
   );
-}
+});
 
 function AboutSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -829,7 +891,8 @@ function AboutSection() {
   );
 }
 
-function ContactSection() {
+// PERF: Memoized ContactSection with GPU-accelerated GSAP animations
+const ContactSection = memo(function ContactSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const inputsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -848,6 +911,7 @@ function ContactSection() {
       inputsRef.current.forEach((input, index) => {
         if (!input) return;
         
+        // PERF: Add force3D for GPU acceleration
         gsap.fromTo(input, 
           { 
             x: index % 2 === 0 ? -60 : 60, 
@@ -861,10 +925,12 @@ function ContactSection() {
             duration: 1,
             delay: index * 0.12,
             ease: "power3.out",
+            force3D: true,
             scrollTrigger: {
               trigger: input,
               start: "top 85%",
-              toggleActions: "play none none reverse"
+              toggleActions: "play none none reverse",
+              fastScrollEnd: true,
             }
           }
         );
@@ -1204,7 +1270,7 @@ function ContactSection() {
       </div>
     </section>
   );
-}
+});
 
 export default function LandingPage() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -1223,17 +1289,20 @@ export default function LandingPage() {
     if (!heroRef.current) return;
     
     const ctx = gsap.context(() => {
+      // PERF: Add force3D for GPU acceleration
       gsap.to('.hero-orb-1', {
         scrollTrigger: {
           trigger: heroRef.current,
           start: "top top",
           end: "bottom top",
           scrub: 1,
+          fastScrollEnd: true,
         },
         y: 350,
         scale: 1.5,
         opacity: 0.3,
-        ease: "none"
+        ease: "none",
+        force3D: true
       });
       
       gsap.to('.hero-orb-2', {
@@ -1242,11 +1311,13 @@ export default function LandingPage() {
           start: "top top",
           end: "bottom top",
           scrub: 1,
+          fastScrollEnd: true,
         },
         y: 450,
         scale: 0.6,
         opacity: 0.2,
-        ease: "none"
+        ease: "none",
+        force3D: true
       });
 
       gsap.to('.hero-grid', {
@@ -1255,10 +1326,12 @@ export default function LandingPage() {
           start: "top top",
           end: "50% top",
           scrub: 1,
+          fastScrollEnd: true,
         },
         opacity: 0,
         scale: 1.2,
-        ease: "none"
+        ease: "none",
+        force3D: true
       });
 
     }, heroRef);
@@ -1373,11 +1446,13 @@ export default function LandingPage() {
             </motion.span>
           </div>
 
+          {/* PERF: Removed filter: blur animation - use opacity + y only */}
           <motion.p 
-            initial={{ opacity: 0, y: 40, filter: 'blur(15px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.4, delay: 0.9, ease: appleEase }}
             className="mt-8 max-w-xl text-[#86868B] text-lg md:text-xl font-light leading-relaxed"
+            style={{ willChange: 'transform, opacity', transform: 'translateZ(0)' }}
           >
             Where innovation meets action. Join the most ambitious tech community 
             at NSBM Green University.
