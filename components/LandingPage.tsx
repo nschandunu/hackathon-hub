@@ -956,7 +956,7 @@ const ContactSection = memo(function ContactSection() {
         </svg>
       ),
       label: "Email",
-      value: "hello@hackathonhub.dev",
+      value: "hh@nsbm.ac.lk",
       color: "#6B8E23"
     },
     { 
@@ -967,7 +967,7 @@ const ContactSection = memo(function ContactSection() {
         </svg>
       ),
       label: "Location",
-      value: "NSBM Green University",
+      value: "B2 Floor, FOC, NSBM Green University",
       color: "#6B8E23"
     },
     { 
@@ -977,7 +977,7 @@ const ContactSection = memo(function ContactSection() {
         </svg>
       ),
       label: "Response Time",
-      value: "Within 24 hours",
+      value: "Within 1 hour",
       color: "#8FBC8F"
     }
   ];
@@ -1166,33 +1166,43 @@ const ContactSection = memo(function ContactSection() {
                   className="group cursor-pointer"
                   style={{ transformStyle: 'preserve-3d' }}
                 >
-                  <GlassCard className="p-6 flex items-center gap-5 hover:border-white/[0.15] transition-all duration-500">
-                    <motion.div 
-                      className="w-12 h-12 rounded-xl bg-white/[0.03] flex items-center justify-center border border-white/[0.08]"
-                      style={{ color: info.color }}
-                      whileHover={{ 
-                        scale: 1.1, 
-                        backgroundColor: `${info.color}20`,
-                        boxShadow: `0 0 30px ${info.color}40`
-                      }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {info.icon}
-                    </motion.div>
-                    <div>
-                      <p className="text-[#86868B] text-xs uppercase tracking-wider mb-1">{info.label}</p>
-                      <p className="text-white text-sm font-medium">{info.value}</p>
+                  <GlassCard className="p-8 hover:border-white/[0.15] transition-all duration-500">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-10">
+                        <motion.div 
+                          className="w-12 h-12 rounded-xl bg-white/[0.03] flex-shrink-0 flex items-center justify-center border border-white/[0.08]"
+                          style={{ color: info.color }}
+                          animate={{ y: [0, -4, 0] }}
+                          whileHover={{ 
+                            scale: 1.15, 
+                            backgroundColor: `${info.color}20`,
+                            boxShadow: `0 0 30px ${info.color}40`
+                          }}
+                          transition={{ 
+                            y: { duration: 3, repeat: Infinity, ease: appleEase },
+                            scale: { duration: 0.3, ease: appleBounce },
+                            backgroundColor: { duration: 0.3 },
+                            boxShadow: { duration: 0.3 }
+                          }}
+                        >
+                          {info.icon}
+                        </motion.div>
+                        <div>
+                          <p className="text-[#86868B] text-xs uppercase tracking-wider mb-1 font-semibold">{info.label}</p>
+                          <p className="text-white text-sm font-medium">{info.value}</p>
+                        </div>
+                      </div>
+                      <motion.svg 
+                        className="w-5 h-5 text-[#86868B] flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                        animate={{ x: [0, 4, 0] }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: appleBounce }}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </motion.svg>
                     </div>
-                    <motion.svg 
-                      className="w-5 h-5 text-[#86868B] ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
-                      stroke="currentColor"
-                      animate={{ x: [0, 3, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </motion.svg>
                   </GlassCard>
                 </motion.div>
               ))}
