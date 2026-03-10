@@ -72,7 +72,7 @@ export default function Contact() {
 
                                 <div className="relative flex items-start gap-5">
                                     <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-500/20 group-hover:border-indigo-400/30 transition-all duration-500 group-hover:animate-pulse-glow-icon">
-                                        <MessageSquare className="w-6 h-6 text-indigo-400 group-hover:text-indigo-300 transition-colors duration-300 animate-float-bounce" />
+                                        <MessageSquare className="w-6 h-6 text-indigo-400 group-hover:text-indigo-300 transition-colors duration-300 animate-mini-shake" />
                                     </div>
 
                                     <div className="flex-1 min-w-0">
