@@ -1,4 +1,7 @@
 import Navbar from "@/components/Navbar";
+import ContactForm from "./contact-form";
+import LiquidEther from "@/components/LiquidEther";
+
 
 import { Send, Mail } from "lucide-react";
 import Link from "next/link";
@@ -10,7 +13,18 @@ export default function Contact() {
             
             <Navbar />
 
-            <main className="min-h-screen flex flex-col bg-black text-white selection:bg-white selection:text-black">
+            <main className="relative min-h-screen flex flex-col bg-black text-white selection:bg-white selection:text-black overflow-hidden">
+                <div className="absolute inset-0 z-0 opacity-15">
+                    <LiquidEther
+                        colors={['#6B8E23', '#8FBC8F', '#000000']}
+                        mouseForce={25}
+                        cursorSize={180}
+                        isViscous={true}
+                        viscous={60}
+                        autoDemo={true}
+                        autoSpeed={0.15}
+                    />
+                </div>
                 <style>{`
                     @keyframes float-bounce {
                         0%, 100% { transform: translateY(0px); }
@@ -43,24 +57,9 @@ export default function Contact() {
                     }
                 `}</style>
 
-                <div className="flex-1 w-full flex flex-col items-center">
-                    {/* ── Hero Header ── */}
-                    <section className="w-full pt-32 pb-16 px-6 text-center relative overflow-hidden">
-                        {/* Ambient glow */}
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gradient-radial from-indigo-500/15 via-transparent to-transparent pointer-events-none animate-pulse-glow" />
-
-                        <h1 className="relative text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-r from-white via-white/90 to-white/60 bg-clip-text text-transparent">
-                            Get in Touch
-                        </h1>
-                        <p className="relative mt-5 max-w-xl mx-auto text-lg md:text-xl text-white/50 leading-relaxed">
-                            Have questions about the hackathon? Want to partner with us or need
-                            help getting started? Reach out — our organising team is always
-                            happy to help.
-                        </p>
-                    </section>
-
+                <div className="relative z-10 flex-1 w-full flex flex-col items-center">
                     {/* ── Content Grid ── */}
-                    <section className="w-full max-w-6xl mx-auto px-6 pb-24 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <section className="w-full max-w-6xl mx-auto px-6 pt-32 pb-24 grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* ─── Left Column: Community Cards ─── */}
                         <div className="flex flex-col gap-6">
                             {/* Discord Card */}
@@ -127,108 +126,7 @@ export default function Contact() {
                             </Link>
                         </div>
 
-                        {/* ─── Right Column: Contact Form ─── */}
-                        <div className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm p-8 lg:p-10">
-                            {/* Subtle top accent */}
-                            <div className="absolute top-0 left-8 right-8 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-                            <h2 className="text-2xl font-semibold text-white mb-1">
-                                Send us a message
-                            </h2>
-                            <p className="text-white/40 text-sm mb-8">
-                                For sponsorships, partnerships, or any specific inquiry.
-                            </p>
-
-                            <form className="space-y-5">
-                                {/* Name */}
-                                <div>
-                                    <label
-                                        htmlFor="contact-name"
-                                        className="block text-sm font-medium text-white/60 mb-1.5"
-                                    >
-                                        Name
-                                    </label>
-                                    <input
-                                        id="contact-name"
-                                        name="name"
-                                        type="text"
-                                        required
-                                        placeholder="Your full name"
-                                        className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-white placeholder:text-white/25 transition-all duration-300 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 focus:bg-white/[0.06] hover:border-white/[0.14]"
-                                    />
-                                </div>
-
-                                {/* Email */}
-                                <div>
-                                    <label
-                                        htmlFor="contact-email"
-                                        className="block text-sm font-medium text-white/60 mb-1.5"
-                                    >
-                                        Email
-                                    </label>
-                                    <input
-                                        id="contact-email"
-                                        name="email"
-                                        type="email"
-                                        required
-                                        placeholder="you@example.com"
-                                        className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-white placeholder:text-white/25 transition-all duration-300 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 focus:bg-white/[0.06] hover:border-white/[0.14]"
-                                    />
-                                </div>
-
-                                {/* Subject Category */}
-                                <div>
-                                    <label
-                                        htmlFor="contact-subject"
-                                        className="block text-sm font-medium text-white/60 mb-1.5"
-                                    >
-                                        Subject
-                                    </label>
-                                    <select
-                                        id="contact-subject"
-                                        name="subject"
-                                        required
-                                        defaultValue=""
-                                        className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-white appearance-none transition-all duration-300 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 focus:bg-white/[0.06] hover:border-white/[0.14] [&>option]:bg-neutral-900 [&>option]:text-white"
-                                    >
-                                        <option value="" disabled className="text-white/25">
-                                            Select a category…
-                                        </option>
-                                        <option value="general">General Question</option>
-                                        <option value="sponsorship">Sponsorship</option>
-                                        <option value="partnership">Event Partnership</option>
-                                        <option value="feedback">Website Feedback</option>
-                                    </select>
-                                </div>
-
-                                {/* Message */}
-                                <div>
-                                    <label
-                                        htmlFor="contact-message"
-                                        className="block text-sm font-medium text-white/60 mb-1.5"
-                                    >
-                                        Message
-                                    </label>
-                                    <textarea
-                                        id="contact-message"
-                                        name="message"
-                                        required
-                                        rows={4}
-                                        placeholder="Tell us what's on your mind…"
-                                        className="w-full rounded-xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 text-white placeholder:text-white/25 resize-y min-h-[120px] transition-all duration-300 focus:outline-none focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 focus:bg-white/[0.06] hover:border-white/[0.14]"
-                                    />
-                                </div>
-
-                                {/* Submit */}
-                                <button
-                                    type="submit"
-                                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-white text-black font-semibold px-6 py-3.5 transition-all duration-300 hover:bg-white/90 hover:shadow-[0_0_30px_-6px_rgba(255,255,255,0.25)] active:scale-[0.98]"
-                                >
-                                    <Send className="w-4 h-4" />
-                                    Send Message
-                                </button>
-                            </form>
-                        </div>
+                        <ContactForm />
                     </section>
                 </div>
             </main>
