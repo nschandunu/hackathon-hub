@@ -1,5 +1,5 @@
 import Navbar from "@/components/Navbar";
-import ClientLoader from "@/components/ClientLoader";
+
 import { Send, Mail } from "lucide-react";
 import Link from "next/link";
 import { MessageSquare, MessageCircle, ArrowRight } from "lucide-react";
@@ -7,7 +7,7 @@ import { MessageSquare, MessageCircle, ArrowRight } from "lucide-react";
 export default function Contact() {
     return (
         <>
-            <ClientLoader />
+            
             <Navbar />
 
             <main className="min-h-screen flex flex-col bg-black text-white selection:bg-white selection:text-black">
