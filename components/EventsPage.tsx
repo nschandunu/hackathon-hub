@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect, useMemo } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import type { EventWithMedia } from "@/app/actions/public-events";
+import EventGalleryModal from "@/components/EventGalleryModal";
 
 // ─── Constants ───────────────────────────────────────────────────────
 const appleEase: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
@@ -352,7 +353,7 @@ export default function EventsPage({
 }: {
   events: EventWithMedia[];
 }) {
-  const [selectedEvent, setSelectedEvent] = useState<EventCardData | null>(null);
+  const [selectedRawEvent, setSelectedRawEvent] = useState<EventWithMedia | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterTab>("All");
 
   // Transform events into card data
@@ -403,7 +404,13 @@ export default function EventsPage({
 
       {/* Gallery */}
       {filteredEvents.length > 0 ? (
-        <FlatGallery events={filteredEvents} onSelect={setSelectedEvent} />
+        <FlatGallery
+          events={filteredEvents}
+          onSelect={(card) => {
+            const raw = rawEvents.find((e) => e.id === card.id) ?? null;
+            setSelectedRawEvent(raw);
+          }}
+        />
       ) : (
         <div className="flex flex-col items-center justify-center py-32 px-6">
           <motion.div
@@ -437,12 +444,12 @@ export default function EventsPage({
         </div>
       )}
 
-      {/* Event Modal */}
+      {/* Event Gallery Modal */}
       <AnimatePresence>
-        {selectedEvent && (
-          <EventModal
-            event={selectedEvent}
-            onClose={() => setSelectedEvent(null)}
+        {selectedRawEvent && (
+          <EventGalleryModal
+            event={selectedRawEvent}
+            onClose={() => setSelectedRawEvent(null)}
           />
         )}
       </AnimatePresence>
