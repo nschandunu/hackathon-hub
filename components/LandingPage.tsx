@@ -17,17 +17,23 @@ const appleEase: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 const appleBounce: [number, number, number, number] = [0.34, 1.56, 0.64, 1];
 
 // PERF: Memoize MagneticButton to prevent unnecessary re-renders
+// Omit React HTML event handlers that conflict with Framer Motion's overrides
+type MotionConflictingProps = 'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration' | 'onDrag' | 'onDragStart' | 'onDragEnd' | 'onDragEnter' | 'onDragLeave' | 'onDragOver' | 'onTransitionEnd' | 'style';
+
+type MagneticButtonProps = {
+  children: React.ReactNode;
+  className?: string;
+  strength?: number;
+  glowColor?: string;
+} & Omit<React.ComponentPropsWithoutRef<'button'>, 'children' | 'className' | MotionConflictingProps>;
+
 const MagneticButton = memo(function MagneticButton({ 
   children, 
   className = "",
   strength = 0.3,
-  glowColor = "rgba(107, 142, 35, 0.4)"
-}: { 
-  children: React.ReactNode; 
-  className?: string;
-  strength?: number;
-  glowColor?: string;
-}) {
+  glowColor = "rgba(107, 142, 35, 0.4)",
+  ...buttonProps
+}: MagneticButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -70,6 +76,7 @@ const MagneticButton = memo(function MagneticButton({
   return (
     <motion.button
       ref={ref}
+      {...buttonProps}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
@@ -527,6 +534,7 @@ const BentoEvents = memo(function BentoEvents() {
 
   return (
     <section 
+      id="events"
       ref={sectionRef} 
       className="w-full bg-black py-40 md:py-52 px-6 flex flex-col items-center overflow-hidden"
       style={{ perspective: '2000px' }}
@@ -1387,7 +1395,7 @@ export default function LandingPage() {
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#556B2F]/10 blur-[120px]" 
           />
           
-          <div className="absolute inset-0 opacity-15">
+          <div className="absolute inset-0 opacity-15 pointer-events-none">
             <LiquidEther
               colors={['#6B8E23', '#8FBC8F', '#000000']}
               mouseForce={25}
@@ -1464,50 +1472,54 @@ export default function LandingPage() {
             transition={{ duration: 1.4, delay: 1.1, ease: appleEase }}
             className="mt-10 flex flex-col sm:flex-row gap-4"
           >
-            <MagneticButton 
-              className="group relative px-12 py-5 rounded-full bg-white text-black font-semibold text-sm tracking-wide transition-all duration-700 hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] hover:bg-white"
-              strength={0.4}
-              glowColor="rgba(255, 255, 255, 0.5)"
-            >
-              <span className="relative z-10 flex items-center gap-2">
-                Join the Society
-                <motion.span
-                  className="inline-block"
-                  animate={{ x: [0, 4, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  →
-                </motion.span>
-              </span>
-              
-              <div className="absolute inset-0 rounded-full overflow-hidden">
-                <motion.div 
-                  className="absolute -inset-full top-0 bg-gradient-to-r from-transparent via-black/5 to-transparent skew-x-12"
-                  animate={{ x: ['0%', '200%'] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
-                />
-              </div>
-            </MagneticButton>
+            <Link href="/join">
+              <MagneticButton 
+                className="group relative px-12 py-5 rounded-full bg-white text-black font-semibold text-sm tracking-wide transition-all duration-700 hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] hover:bg-white"
+                strength={0.4}
+                glowColor="rgba(255, 255, 255, 0.5)"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  Join the Society
+                  <motion.span
+                    className="inline-block"
+                    animate={{ x: [0, 4, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    →
+                  </motion.span>
+                </span>
+                
+                <div className="absolute inset-0 rounded-full overflow-hidden">
+                  <motion.div 
+                    className="absolute -inset-full top-0 bg-gradient-to-r from-transparent via-black/5 to-transparent skew-x-12"
+                    animate={{ x: ['0%', '200%'] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear", repeatDelay: 1 }}
+                  />
+                </div>
+              </MagneticButton>
+            </Link>
             
-            <MagneticButton 
-              className="group px-12 py-5 rounded-full bg-white/[0.03] backdrop-blur-2xl border border-white/[0.1] text-white font-semibold text-sm tracking-wide hover:bg-white/[0.08] hover:border-white/[0.25] hover:shadow-[0_0_40px_rgba(10,132,255,0.2)] transition-all duration-700"
-              strength={0.4}
-              glowColor="rgba(107, 142, 35, 0.5)"
-            >
-              <span className="flex items-center gap-3">
-                Explore Events
-                <motion.svg 
-                  className="w-4 h-4" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                  animate={{ x: [0, 3, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </motion.svg>
-              </span>
-            </MagneticButton>
+            <Link href="/events">
+              <MagneticButton 
+                className="group px-12 py-5 rounded-full bg-white/[0.03] backdrop-blur-2xl border border-white/[0.1] text-white font-semibold text-sm tracking-wide hover:bg-white/[0.08] hover:border-white/[0.25] hover:shadow-[0_0_40px_rgba(10,132,255,0.2)] transition-all duration-700"
+                strength={0.4}
+                glowColor="rgba(107, 142, 35, 0.5)"
+              >
+                <span className="flex items-center gap-3">
+                  Explore Events
+                  <motion.svg 
+                    className="w-4 h-4" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                    animate={{ x: [0, 3, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </motion.svg>
+                </span>
+              </MagneticButton>
+            </Link>
           </motion.div>
         </div>
 
