@@ -1499,7 +1499,7 @@ export default function LandingPage() {
               </MagneticButton>
             </Link>
             
-            <Link href="#events">
+            <Link href="/events">
               <MagneticButton 
                 className="group px-12 py-5 rounded-full bg-white/[0.03] backdrop-blur-2xl border border-white/[0.1] text-white font-semibold text-sm tracking-wide hover:bg-white/[0.08] hover:border-white/[0.25] hover:shadow-[0_0_40px_rgba(10,132,255,0.2)] transition-all duration-700"
                 strength={0.4}
