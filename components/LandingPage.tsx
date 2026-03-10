@@ -1590,7 +1590,7 @@ export default function LandingPage() {
         
         <div className="max-w-7xl mx-auto px-6 py-20 md:py-28">
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 mb-16">
 
             <motion.div 
               className="md:col-span-1"
@@ -1629,9 +1629,8 @@ export default function LandingPage() {
             </motion.div>
             
             {[
-              { title: 'Explore', links: ['Events', 'Hackathons', 'Workshops', 'Community'] },
-              { title: 'Resources', links: ['Documentation', 'Blog', 'Tutorials', 'FAQ'] },
-              { title: 'Company', links: ['About', 'Team', 'Careers', 'Contact'] }
+              { title: 'Explore', links: ['Home', 'About', 'Events', 'Contact'] },
+              { title: 'Resources', links: ['Documentation', 'Blog', 'Tutorials', 'FAQ'] }
             ].map((column, colIndex) => (
               <motion.div 
                 key={column.title}
