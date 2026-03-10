@@ -10,6 +10,7 @@ import ScrollVelocity from './ScrollVelocity';
 import ScrollReveal from './ScrollReveal';
 import { submitContactForm } from '@/app/actions/contact-actions';
 import { CheckCircle } from 'lucide-react';
+import type { EventWithMedia } from '@/app/actions/public-events';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -274,68 +275,38 @@ const fadeUpVariant = {
   }
 };
 
-const EVENTS = [
-  {
-    id: 1,
-    title: "Hack-In-Shell 2026",
-    date: "MARCH 15, 2026",
-    tag: "FLAGSHIP",
-    description: "The flagship 24-hour hackathon of NSBM Computing Society. Build something extraordinary.",
-    size: "md:col-span-2 md:row-span-2",
-    image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop",
-    gradient: "from-blue-500/20 to-purple-500/20"
-  },
-  {
-    id: 2,
-    title: "Code Combat 1.0",
-    date: "APRIL 02, 2026",
-    tag: "COMPETITIVE",
-    description: "Speed coding tournament.",
-    size: "col-span-1 row-span-1",
-    image: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=2069&auto=format&fit=crop",
-    gradient: "from-orange-500/20 to-red-500/20"
-  },
-  {
-    id: 3,
-    title: "Terminal Velocity",
-    date: "APRIL 20, 2026",
-    tag: "WORKSHOP",
-    description: "Mastering the Linux CLI.",
-    size: "col-span-1 row-span-1",
-    image: "https://images.unsplash.com/photo-1629654297299-c8506221ca97?q=80&w=1974&auto=format&fit=crop",
-    gradient: "from-green-500/20 to-teal-500/20"
-  },
-  {
-    id: 4,
-    title: "DevSprint x NSBM",
-    date: "MAY 05, 2026",
-    tag: "SPRINT",
-    description: "Open source contribution day.",
-    size: "col-span-1 row-span-1",
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070&auto=format&fit=crop",
-    gradient: "from-cyan-500/20 to-blue-500/20"
-  },
-  {
-    id: 5,
-    title: "AI Nexus Summit",
-    date: "MAY 12, 2026",
-    tag: "SUMMIT",
-    description: "Exploring LLMs & Agents.",
-    size: "col-span-1 row-span-1",
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070&auto=format&fit=crop",
-    gradient: "from-purple-500/20 to-pink-500/20"
-  },
-  {
-    id: 6,
-    title: "UI/UX Forge",
-    date: "JUNE 02, 2026",
-    tag: "DESIGN",
-    description: "Crafting interfaces that breathe.",
-    size: "col-span-1 row-span-1",
-    image: "https://images.unsplash.com/photo-1586717791821-3f44a563eb4c?q=80&w=2070&auto=format&fit=crop",
-    gradient: "from-pink-500/20 to-rose-500/20"
-  }
+const GRADIENTS = [
+  "from-blue-500/20 to-purple-500/20",
+  "from-orange-500/20 to-red-500/20",
+  "from-green-500/20 to-teal-500/20",
+  "from-cyan-500/20 to-blue-500/20",
+  "from-purple-500/20 to-pink-500/20",
+  "from-pink-500/20 to-rose-500/20",
 ];
+
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop";
+
+function mapEventsToCards(events: EventWithMedia[]) {
+  return events.slice(0, 6).map((event, index) => {
+    const gallery = event.media.find((m) => m.type === "GALLERY");
+    const image = event.thumbnailUrl || gallery?.url || FALLBACK_IMAGE;
+
+    return {
+      id: event.id,
+      title: event.title,
+      date: new Date(event.date).toLocaleDateString('en-US', {
+        month: 'long',
+        day: '2-digit',
+        year: 'numeric',
+      }).toUpperCase(),
+      tag: event.status,
+      description: event.description || '',
+      size: index === 0 ? "md:col-span-2 md:row-span-2" : "col-span-1 row-span-1",
+      image,
+      gradient: GRADIENTS[index % GRADIENTS.length],
+    };
+  });
+}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -368,7 +339,7 @@ function GlassCard({ children, className = "" }: { children: React.ReactNode; cl
     <div className={`relative rounded-3xl bg-white/[0.02] backdrop-blur-2xl border border-white/[0.06] ${className}`}>
       <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/[0.06] via-transparent to-transparent opacity-60" />
       <div className="absolute inset-0 rounded-3xl opacity-[0.012] bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E')]" />
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 h-full">{children}</div>
     </div>
   );
 }
@@ -423,7 +394,8 @@ function SectionTitle({
 }
 
 // PERF: Memoized BentoEvents with optimized GSAP and mouse handlers
-const BentoEvents = memo(function BentoEvents() {
+const BentoEvents = memo(function BentoEvents({ events }: { events: EventWithMedia[] }) {
+  const cards = useMemo(() => mapEventsToCards(events), [events]);
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   // PERF: RAF throttling for mouse handlers
@@ -551,7 +523,7 @@ const BentoEvents = memo(function BentoEvents() {
         />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 auto-rows-[280px]">
-          {EVENTS.map((event, index) => (
+          {cards.map((event, index) => (
             <div
               key={event.id}
               ref={el => { cardsRef.current[index] = el; }}
@@ -569,7 +541,7 @@ const BentoEvents = memo(function BentoEvents() {
                 />
 
                 <motion.div
-                  className="absolute inset-0 rounded-3xl bg-cover bg-center opacity-20"
+                  className="absolute inset-0 rounded-3xl bg-cover bg-center opacity-100"
                   style={{
                     backgroundImage: `url(${event.image})`,
                     transformStyle: 'preserve-3d',
@@ -577,7 +549,7 @@ const BentoEvents = memo(function BentoEvents() {
                   }}
                   whileHover={{
                     scale: 1.2,
-                    opacity: 0.4,
+                    opacity: 0.7,
                     filter: 'blur(0px)'
                   }}
                   transition={{ duration: 0.8, ease: appleEase }}
@@ -608,17 +580,6 @@ const BentoEvents = memo(function BentoEvents() {
                   >
                     {event.title}
                   </motion.h3>
-
-                  {/* PERF: Removed filter: blur animation - use opacity + y only */}
-                  <motion.p
-                    className="text-[#86868B] text-sm mt-3 line-clamp-2 max-w-[90%]"
-                    initial={{ opacity: 0, y: 15 }}
-                    whileHover={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: appleEase }}
-                    style={{ willChange: 'transform, opacity', transform: 'translateZ(0)' }}
-                  >
-                    {event.description}
-                  </motion.p>
 
                   <div className="mt-5 flex items-center justify-between">
                     <span className="text-[#86868B] text-[11px] tracking-wider font-medium">{event.date}</span>
@@ -1360,7 +1321,7 @@ const ContactSection = memo(function ContactSection() {
   );
 });
 
-export default function LandingPage() {
+export default function LandingPage({ events }: { events: EventWithMedia[] }) {
   const heroRef = useRef<HTMLDivElement>(null);
   const heroContentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -1646,7 +1607,7 @@ export default function LandingPage() {
         />
       </section>
 
-      <BentoEvents />
+      <BentoEvents events={events} />
 
       <AboutSection />
 
