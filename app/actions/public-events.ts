@@ -32,5 +32,20 @@ export async function getPastEvents() {
     });
 }
 
+export async function getAllEvents() {
+    return prisma.event.findMany({
+        where: {
+            isPublished: true,
+        },
+        include: {
+            media: {
+                where: { type: "GALLERY" },
+            },
+        },
+        orderBy: { date: "asc" },
+    });
+}
+
 export type UpcomingEvent = Awaited<ReturnType<typeof getUpcomingEvents>>[number];
 export type PastEvent = Awaited<ReturnType<typeof getPastEvents>>[number];
+export type EventWithMedia = Awaited<ReturnType<typeof getAllEvents>>[number];

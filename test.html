@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Height Test</title>
+    <style>
+        .wrapper {
+            background-color: red;
+            min-height: 400px;
+            width: 100%;
+            position: relative;
+        }
+        .child {
+            background-color: blue;
+            height: 100%;
+        }
+        .inner-absolute {
+            position: absolute;
+            top: 0; bottom: 0; left: 0; right: 0;
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="child">
+            <div class="inner-absolute">Green absolute box</div>
+        </div>
+    </div>
+</body>
+</html>

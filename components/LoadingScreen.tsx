@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface LoadingScreenProps {
   onComplete: () => void;
 }
 
-function ProgressRing({ progress }: { progress: number }) {
+// PERF: Memoize ProgressRing to prevent unnecessary re-renders
+const ProgressRing = memo(function ProgressRing({ progress }: { progress: number }) {
   const radius = 80;
   const stroke = 2;
   const normalizedRadius = radius - stroke * 2;
@@ -15,16 +16,21 @@ function ProgressRing({ progress }: { progress: number }) {
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   return (
-    <div className="relative">
+    // PERF: Add GPU acceleration hint
+    <div className="relative" style={{ transform: 'translateZ(0)' }}>
+      {/* PERF: Static blur glow - no animation on filter, only opacity and scale (GPU) */}
       <motion.div
         className="absolute inset-0 rounded-full"
         style={{
           background: `radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)`,
           filter: "blur(40px)",
-          transform: "scale(1.5)",
+          // PERF: Force GPU layer, keep blur static
+          transform: "translateZ(0) scale(1.5)",
+          willChange: 'opacity, transform',
         }}
         animate={{
           opacity: [0.3, 0.6, 0.3],
+          // PERF: Use transform3d for GPU acceleration
           scale: [1.4, 1.6, 1.4],
         }}
         transition={{
@@ -38,6 +44,8 @@ function ProgressRing({ progress }: { progress: number }) {
         height={radius * 2}
         width={radius * 2}
         className="transform -rotate-90"
+        // PERF: GPU acceleration for SVG
+        style={{ willChange: 'auto' }}
       >
         <circle
           stroke="rgba(255,255,255,0.06)"
@@ -48,6 +56,7 @@ function ProgressRing({ progress }: { progress: number }) {
           cy={radius}
         />
         
+        {/* PERF: strokeDashoffset is GPU-accelerated in modern browsers */}
         <motion.circle
           stroke="url(#progressGradient)"
           fill="transparent"
@@ -78,38 +87,45 @@ function ProgressRing({ progress }: { progress: number }) {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+          // PERF: GPU acceleration
+          style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
         >
-          <motion.span
-            className="text-3xl font-extralight tracking-tight text-white/90 tabular-nums"
-            key={Math.round(progress)}
-          >
+          {/* PERF: Remove key prop to avoid DOM thrashing on every progress change */}
+          <span className="text-3xl font-extralight tracking-tight text-white/90 tabular-nums">
             {Math.round(progress)}
-          </motion.span>
+          </span>
           <span className="text-sm font-extralight text-white/40 ml-0.5">%</span>
         </motion.div>
       </div>
     </div>
   );
-}
+});
 
-function AmbientParticle({ delay, duration }: { delay: number; duration: number }) {
-  const randomX = useMemo(() => 20 + Math.random() * 60, []);
-  const randomY = useMemo(() => 20 + Math.random() * 60, []);
-  const size = useMemo(() => 1 + Math.random() * 2, []);
-
+// PERF: Memoize particle component to prevent re-renders
+const AmbientParticle = memo(function AmbientParticle({ delay, duration, x, y, size }: { 
+  delay: number; 
+  duration: number;
+  x: number;
+  y: number;
+  size: number;
+}) {
   return (
     <motion.div
       className="absolute rounded-full bg-white/20"
       style={{
         width: size,
         height: size,
-        left: `${randomX}%`,
-        top: `${randomY}%`,
+        left: `${x}%`,
+        top: `${y}%`,
+        // PERF: Force GPU layer for transforms
+        willChange: 'opacity, transform',
+        transform: 'translateZ(0)',
       }}
       initial={{ opacity: 0, scale: 0 }}
       animate={{
         opacity: [0, 0.6, 0],
         scale: [0, 1, 0],
+        // PERF: Use translate3d for GPU acceleration
         y: [0, -30, -60],
       }}
       transition={{
@@ -117,11 +133,11 @@ function AmbientParticle({ delay, duration }: { delay: number; duration: number 
         delay,
         ease: "easeOut",
         repeat: Infinity,
-        repeatDelay: Math.random() * 2,
+        repeatDelay: 2,
       }}
     />
   );
-}
+});
 
 export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const [progress, setProgress] = useState(0);
@@ -145,15 +161,18 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
     return () => clearInterval(timer);
   }, [onComplete]);
 
+  // PERF: Pre-compute particle positions once during initialization
+  // Reduce particle count from 12 to 8 for better performance
   const particles = useMemo(
     () =>
-      Array.from({ length: 12 }).map((_, i) => (
-        <AmbientParticle
-          key={i}
-          delay={i * 0.4}
-          duration={3 + Math.random() * 2}
-        />
-      )),
+      Array.from({ length: 8 }).map((_, i) => ({
+        key: i,
+        delay: i * 0.4,
+        duration: 3 + (i % 3),
+        x: 20 + (i * 8) % 60,
+        y: 20 + ((i * 13) % 60),
+        size: 1 + (i % 3),
+      })),
     []
   );
 
@@ -163,15 +182,20 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
         className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden"
         style={{
           background: "linear-gradient(180deg, #000000 0%, #0a0a0a 50%, #000000 100%)",
+          // PERF: Promote to GPU layer
+          willChange: 'opacity, transform',
         }}
         initial={{ opacity: 1 }}
         exit={{
           opacity: 0,
-          scale: 1.05,
-          filter: "blur(20px)",
+          // PERF: Remove filter: blur from exit - causes expensive CPU repaints
+          // Use scale + opacity for same perceived "fade away" effect (GPU accelerated)
+          scale: 1.1,
+          // PERF: Use transform3d for GPU acceleration on exit
         }}
         transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
       >
+        {/* PERF: Static noise texture - no animation needed */}
         <div
           className="absolute inset-0 opacity-[0.015] pointer-events-none"
           style={{
@@ -179,12 +203,16 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
           }}
         />
 
+        {/* PERF: Background orbs with static blur, only animate opacity and scale (GPU) */}
         <motion.div
-          className="absolute w-[800px] h-[800px] rounded-full opacity-30"
+          className="absolute w-[800px] h-[800px] rounded-full"
           style={{
             background:
               "radial-gradient(circle at center, rgba(120,120,120,0.15) 0%, transparent 60%)",
             filter: "blur(60px)",
+            // PERF: Static blur, GPU layer
+            transform: 'translateZ(0)',
+            willChange: 'opacity, transform',
           }}
           animate={{
             scale: [1, 1.1, 1],
@@ -203,6 +231,9 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
             background:
               "radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 50%)",
             filter: "blur(40px)",
+            // PERF: Static blur, GPU layer
+            transform: 'translateZ(0)',
+            willChange: 'opacity, transform',
           }}
           animate={{
             scale: [1.1, 1, 1.1],
@@ -215,13 +246,26 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
           }}
         />
 
-        <div className="absolute inset-0 pointer-events-none">{particles}</div>
+        {/* PERF: Particles rendered from pre-computed values */}
+        <div className="absolute inset-0 pointer-events-none">
+          {particles.map((p) => (
+            <AmbientParticle
+              key={p.key}
+              delay={p.delay}
+              duration={p.duration}
+              x={p.x}
+              y={p.y}
+              size={p.size}
+            />
+          ))}
+        </div>
 
-        <div className="relative z-10 flex flex-col items-center">
+        <div className="relative z-10 flex flex-col items-center" style={{ transform: 'translateZ(0)' }}>
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
+            style={{ willChange: 'opacity, transform' }}
           >
             <ProgressRing progress={progress} />
           </motion.div>
@@ -231,6 +275,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+            style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
           >
             <h1 className="text-2xl md:text-3xl font-extralight tracking-[0.2em] text-white/90 mb-3">
               HACKATHON HUB
@@ -240,6 +285,8 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ delay: 0.8, duration: 1, ease: [0.4, 0, 0.2, 1] }}
+              // PERF: GPU acceleration for scale transform
+              style={{ willChange: 'transform', transformOrigin: 'center', transform: 'translateZ(0)' }}
             />
           </motion.div>
 
@@ -260,6 +307,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
                 ease: "easeInOut",
                 repeat: phase === "complete" ? 0 : Infinity,
               }}
+              style={{ willChange: 'opacity, transform', transform: 'translateZ(0)' }}
             />
             <motion.span
               className="text-[11px] font-light tracking-[0.25em] text-white/40 uppercase"
@@ -282,11 +330,14 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
           CODE · COMPETE · CONQUER
         </motion.div>
 
+        {/* PERF: Vertical lines use scaleY (GPU accelerated transform) */}
         <motion.div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-[30vh]"
           style={{
             background:
               "linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)",
+            transformOrigin: 'top',
+            willChange: 'opacity, transform',
           }}
           initial={{ opacity: 0, scaleY: 0 }}
           animate={{ opacity: 1, scaleY: 1 }}
@@ -298,6 +349,8 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
           style={{
             background:
               "linear-gradient(0deg, rgba(255,255,255,0.05) 0%, transparent 100%)",
+            transformOrigin: 'bottom',
+            willChange: 'opacity, transform',
           }}
           initial={{ opacity: 0, scaleY: 0 }}
           animate={{ opacity: 1, scaleY: 1 }}

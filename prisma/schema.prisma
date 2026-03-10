@@ -25,6 +25,7 @@ model Event {
   date             DateTime
   location         String
   registrationLink String?
+  thumbnailUrl     String?
   status           EventStatus @default(UPCOMING)
   isPublished      Boolean     @default(true)
   createdAt        DateTime    @default(now())
@@ -39,4 +40,29 @@ model Media {
   type    MediaType
   eventId String    @db.Uuid
   event   Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  email     String
+  subject   String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model BoardMember {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  position    String
+  description String
+  linkedin    String?
+  twitter     String?
+  github      String?
+  imageUrl    String
+  featured    Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

@@ -86,3 +86,64 @@ export async function addGalleryImages(
         };
     }
 }
+
+export async function updateEventThumbnail(
+    eventId: string,
+    formData: FormData,
+): Promise<ActionState> {
+    try {
+        if (!eventId) {
+            return { success: false, error: "Event ID is required." };
+        }
+
+        const file = formData.get("thumbnail") as File | null;
+        if (!file || file.size === 0) {
+            return { success: false, error: "Please select an image file." };
+        }
+
+        // Look up the event to get the slug for the storage path
+        const event = await prisma.event.findUnique({
+            where: { id: eventId },
+            select: { slug: true },
+        });
+
+        if (!event) {
+            return { success: false, error: "Event not found." };
+        }
+
+        const supabase = await createClient();
+
+        const ext = file.name.split(".").pop();
+        const fileName = `${event.slug}/thumbnail-${crypto.randomUUID()}.${ext}`;
+
+        const { error: uploadError } = await supabase.storage
+            .from("event-media")
+            .upload(fileName, file, {
+                cacheControl: "3600",
+                upsert: false,
+            });
+
+        if (uploadError) {
+            throw new Error(`Upload failed: ${uploadError.message}`);
+        }
+
+        const {
+            data: { publicUrl },
+        } = supabase.storage.from("event-media").getPublicUrl(fileName);
+
+        await prisma.event.update({
+            where: { id: eventId },
+            data: { thumbnailUrl: publicUrl },
+        });
+
+        revalidatePath("/admin");
+        revalidatePath("/");
+        return { success: true };
+    } catch (err) {
+        console.error("Failed to update event thumbnail:", err);
+        return {
+            success: false,
+            error: err instanceof Error ? err.message : "Something went wrong.",
+        };
+    }
+}

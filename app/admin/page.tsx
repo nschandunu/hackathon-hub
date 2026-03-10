@@ -3,7 +3,11 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/db";
 import EventForm from "./EventForm";
 import GalleryUploadForm from "./GalleryUploadForm";
+import ThumbnailUploadForm from "./ThumbnailUploadForm";
 import { LogoutButton } from "@/components/logout-button";
+import Link from "next/link";
+import { MessageSquare } from "lucide-react";
+
 
 export default async function AdminDashboardPage() {
     const events = await prisma.event.findMany({
@@ -12,6 +16,15 @@ export default async function AdminDashboardPage() {
     });
 
     const eventOptions = events.map((e) => ({ id: e.id, title: e.title }));
+    const unreadMessageCount = await prisma.contactMessage.count({
+        where: { isRead: false },
+    });
+
+    const thumbnailEventOptions = events.map((e) => ({
+        id: e.id,
+        title: e.title,
+        thumbnailUrl: e.thumbnailUrl,
+    }));
 
     return (
         <div className="min-h-screen bg-background">
@@ -26,7 +39,29 @@ export default async function AdminDashboardPage() {
                             Manage your hackathon events
                         </p>
                     </div>
-                    <LogoutButton />
+
+                    <div className="flex items-center gap-3">
+                        <Link
+                            href="/admin/board"
+                            className="relative inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                        >
+                            Board Members
+                        </Link>
+                        <Link
+                            href="/admin/messages"
+                            className="relative inline-flex items-center justify-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                        >
+                            <MessageSquare className="w-4 h-4" />
+                            Messages
+                            {unreadMessageCount > 0 && (
+                                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                </span>
+                            )}
+                        </Link>
+                        <LogoutButton />
+                    </div>
                 </div>
 
                 {/* Two-section forms */}
@@ -36,6 +71,11 @@ export default async function AdminDashboardPage() {
 
                     {/* Section B: Update Event Gallery */}
                     <GalleryUploadForm events={eventOptions} />
+                </div>
+
+                {/* Thumbnail Upload Section */}
+                <div className="mb-10">
+                    <ThumbnailUploadForm events={thumbnailEventOptions} />
                 </div>
 
                 {/* Events List */}

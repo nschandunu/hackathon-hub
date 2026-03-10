@@ -23,7 +23,7 @@ export default function Navbar() {
         items={menuItems}
         socialItems={socialItems}
         colors={['#000000', '#0a0a0a', '#111111']} 
-        accentColor="#5227ff"
+        accentColor="#00ad37"
         menuButtonColor="#ffffff"
         openMenuButtonColor="#000000"
         logoUrl="/hhlogo.png"
