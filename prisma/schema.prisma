@@ -3,7 +3,7 @@ generator client {
   output   = "../lib/generated/prisma"
 }
 
-datasource db {
+datasource database {
   provider  = "postgresql"
 }
 
@@ -18,7 +18,7 @@ enum MediaType {
 }
 
 model Event {
-  id               String      @id @default(uuid()) @db.Uuid
+  id               String      @id @default(uuid()) @database.Uuid
   title            String
   slug             String      @unique
   description      String?
@@ -35,25 +35,25 @@ model Event {
 }
 
 model Media {
-  id      String    @id @default(uuid()) @db.Uuid
+  id      String    @id @default(uuid()) @database.Uuid
   url     String
   type    MediaType
-  eventId String    @db.Uuid
+  eventId String    @database.Uuid
   event   Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model ContactMessage {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String   @id @default(uuid()) @database.Uuid
   name      String
   email     String
   subject   String
-  message   String   @db.Text
+  message   String   @database.Text
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 
 model BoardMember {
-  id          String   @id @default(uuid()) @db.Uuid
+  id          String   @id @default(uuid()) @database.Uuid
   name        String
   position    String
   description String
