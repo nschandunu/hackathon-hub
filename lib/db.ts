@@ -1,4 +1,3 @@
-import { Pool } from "pg"; // Import Pool from pg
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/lib/generated/prisma/client";
 
@@ -13,9 +12,9 @@ function createPrismaClient() {
         throw new Error("Missing DATABASE_URL environment variable. Please check your Vercel Environment Variables settings.");
     }
     
-    const pool = new Pool({ connectionString });
-    
-    const adapter = new PrismaPg(pool); 
+    const adapter = new PrismaPg({
+        connectionString,
+    }); 
     
     return new PrismaClient({ adapter });
 }
